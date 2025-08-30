@@ -290,7 +290,7 @@ export default function Drilling() {
         
         {/* Question Card */}
         <div className="min-h-full items-center justify-center">
-          <h2 className="text-2xl font-medium my-4 font-jakarta">
+          <h2 className="text-xl sm:text-2xl font-medium my-4 font-jakarta">
               Select the correct one?
             </h2>
           <div className="w-full h-full bg-yellow rounded-lg shadow-sm p-8 mb-8">
