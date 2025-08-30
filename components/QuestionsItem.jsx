@@ -1,0 +1,37 @@
+const QuestionsItem = ({ currentQ, showResult, selectedAnswer, handleAnswerSelect }) => {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {currentQ.options.map((option, index) => {
+        let buttonClass =
+          "flex w-full h-[100px] sm:h-[160px] lg:h-[160px] bg-red items-center justify-center text-xl font-semibold rounded-lg shadow-sm";
+
+        if (showResult) {
+          if (index === currentQ.correctIndex) {
+            buttonClass += " bg-green-500 text-white border-green-500";
+          } else if (index === selectedAnswer) {
+            buttonClass += " bg-red-500 text-white border-red-500";
+          } else {
+            buttonClass += " bg-gray-200 text-gray-500 border-gray-300";
+          }
+        } else {
+          buttonClass +=
+            " bg-yellow hover:bg-blue-50 border-gray-300 hover:border-blue-500 cursor-pointer";
+        }
+
+        return (
+          <div key={index} className="flex w-full h-[100px] sm:h-[160px] lg:h-[160px] items-center justify-center rounded-lg shadow-md">
+            <button
+              onClick={() => !showResult && handleAnswerSelect(index)}
+              disabled={showResult}
+              className={buttonClass}
+            >
+              {option.romaji}
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default QuestionsItem;
