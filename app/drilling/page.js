@@ -6,6 +6,7 @@ import { hiraganaData } from "../../data/hiraganaData";
 import formatDateTime from "../../util/DateFormat";
 import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
+import { getCurrentHiragana } from "../../util/getData";
 
 export default function Drilling() {
   const router = useRouter();
@@ -29,42 +30,67 @@ export default function Drilling() {
     setPreviousResults(results.slice(-5).reverse());
   };
 
-  const generateQuestions = () => {
+  const generateQuestions = async () => {
     const newQuestions = [];
-    const availableHiragana = hiraganaData.filter(
-      (item) => item.hiragana !== " ",
+    
+    // Calculate overall progress
+    const updatedHiraganaData = await getCurrentHiragana();
+    
+    const totalMasteryLevels = updatedHiraganaData.reduce((sum, item) => sum + item.masteryLevel, 0);
+    const totalPossibleMastery = updatedHiraganaData.filter(item => item.hiragana !== " ").length * 100;
+    const overallProgress = (totalMasteryLevels / totalPossibleMastery) * 100;
+
+    console.log(`this is overall progress: ${overallProgress} and totalPossibleMastery: ${totalMasteryLevels} and ${totalPossibleMastery}`);
+    
+    // Set mastery threshold based on overall progress
+    let masteryThreshold;
+    if (overallProgress < 50) {
+      masteryThreshold = 50;  // Focus on getting everything to 50% first
+    } else if (overallProgress < 70) {
+      masteryThreshold = 70;  // Then focus on getting to 70%
+    } else {
+      masteryThreshold = 100; // Finally work on full mastery
+    }
+    
+    // Filter available hiragana based on threshold
+    const priorityHiragana = hiraganaData.filter(
+      item => item.hiragana !== " " && (item.masteryLevel || 0) < masteryThreshold
     );
-
+    
+    // If we don't have enough priority hiragana, include some higher mastery ones
+    const availableHiragana = priorityHiragana.length >= 10 
+      ? priorityHiragana 
+      : hiraganaData.filter(item => item.hiragana !== " " && item.masteryLevel < 100);
+    
     for (let i = 0; i < 10; i++) {
-      // Randomly select a hiragana character
-      const randomIndex = Math.floor(Math.random() * availableHiragana.length);
-      const correctAnswer = availableHiragana[randomIndex];
-
+      // Prioritize lower mastery characters with weighted random selection
+      const weightedIndex = Math.floor(Math.random() * availableHiragana.length);
+      const correctAnswer = availableHiragana[weightedIndex];
+    
       // Generate 3 random incorrect answers
       const incorrectAnswers = [];
       while (incorrectAnswers.length < 3) {
-        const randomIncorrect =
-          availableHiragana[
-            Math.floor(Math.random() * availableHiragana.length)
-          ];
+        const randomIncorrect = availableHiragana[
+          Math.floor(Math.random() * availableHiragana.length)
+        ];
         if (
           randomIncorrect.romaji !== correctAnswer.romaji &&
-          !incorrectAnswers.some((ans) => ans.romaji === randomIncorrect.romaji)
+          !incorrectAnswers.some(ans => ans.romaji === randomIncorrect.romaji)
         ) {
           incorrectAnswers.push(randomIncorrect);
         }
       }
-
+    
       // Combine and shuffle options
       const options = [correctAnswer, ...incorrectAnswers];
       const shuffledOptions = options.sort(() => Math.random() - 0.5);
-
+    
       newQuestions.push({
         hiragana: correctAnswer.hiragana,
         correctRomaji: correctAnswer.romaji,
         options: shuffledOptions,
         correctIndex: shuffledOptions.findIndex(
-          (opt) => opt.romaji === correctAnswer.romaji,
+          opt => opt.romaji === correctAnswer.romaji
         ),
       });
     }
@@ -157,7 +183,7 @@ export default function Drilling() {
   };
 
   const handleBackToHome = () => {
-    router.push("/");
+    router.back();
   };
 
   const handleRestartDrilling = () => {

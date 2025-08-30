@@ -45,7 +45,7 @@ const HiraganaCard = ({ hiragana, romaji, masteryLevel = 0 }) => {
     if (masteryLevel === 0) return "bg-white";
     // if (masteryLevel >= 1 && masteryLevel <= 29) return "bg-green-100";
     if (masteryLevel >= 1 && masteryLevel <= 29) return "bg-rose-100";
-    if (masteryLevel >= 30 && masteryLevel <= 59) return "bg-rose-300";
+    if (masteryLevel >= 30 && masteryLevel <= 90) return "bg-rose-300";
     return "bg-rose-500"; // masteryLevel >= 60
   };
 
