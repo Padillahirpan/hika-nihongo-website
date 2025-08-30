@@ -280,15 +280,14 @@ export default function Drilling() {
         <div className="flex justify-between items-center mb-8">
           <button
             onClick={handleBackToHome}
-            className="bg-gray-200 hover:bg-gray-400 text-black h-10 w-10 rounded-full transition-colors"
+            className="bg-gray-200 hover:bg-gray-400 text-black h-10 w-10 lg:h-16 lg:w-16 rounded-full transition-colors"
           >
             ←
           </button>
-          
         </div>
+        
         <ProgressBar current={currentQuestion + 1} total={11} />
         
-
         {/* Question Card */}
         <div className="min-h-full items-center justify-center">
           <h2 className="text-2xl font-medium my-4 font-jakarta">
@@ -326,7 +325,11 @@ export default function Drilling() {
                 
                 <button
                   onClick={handleNextQuestion}
-                  className="w-full bg-gradient-to-r mt-4 from-rose-200 to-rose-300 hover:from-rose-400 hover:to-rose-500 text-white px-6 py-4 shadow-lg transition-all duration-300 text-white px-8 py-3 rounded-lg text-sm transition-colors text-jakarta"
+                  className={`w-full mt-4 bg-gradient-to-r ${
+                    selectedAnswer === currentQ.correctIndex 
+                      ? "from-green-400 to-green-600 hover:from-green-600 hover:to-green-700"
+                      : "from-rose-400 to-rose-600 hover:from-rose-600 hover:to-rose-700"
+                  } text-white px-6 py-4 shadow-lg transition-all duration-300 rounded-lg text-sm font-jakarta`}
                 >
                   <span className=" font-semibold">
                     {currentQuestion < 9 ? "Next Question" : "Finish"}

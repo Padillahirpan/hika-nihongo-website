@@ -9,7 +9,7 @@ const QuestionsItem = ({ currentQ, showResult, selectedAnswer, handleAnswerSelec
           if (index === currentQ.correctIndex) {
             buttonClass += " bg-green-500 text-white border-green-500";
           } else if (index === selectedAnswer) {
-            buttonClass += " bg-red-500 text-white border-red-500";
+            buttonClass += " bg-rose-500 text-white border-rose-600";
           } else {
             buttonClass += " bg-gray-200 text-gray-500 border-gray-300";
           }

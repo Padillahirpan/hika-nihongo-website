@@ -10,6 +10,10 @@ export default function HiraganaPage() {
   const router = useRouter();
   const [updatedHiraganaData, setUpdatedHiraganaData] = useState(hiraganaData);
 
+  const handleBackToHome = () => {
+    router.back();
+  };
+
   // Function to load mastery levels from localStorage
   const loadMasteryLevels = () => {
     const savedMasteryLevels = JSON.parse(
@@ -49,10 +53,19 @@ export default function HiraganaPage() {
   return (
     <main className="min-h-screen p-8 bg-gray-100">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-6xl font-bold text-center mb-8 font-jakarta">
-          Hiragana Learning Cards
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <button
+            onClick={handleBackToHome}
+            className="bg-gray-200 hover:bg-gray-400 text-black h-10 w-10 lg:h-16 lg:w-16 rounded-full transition-colors"
+          >
+            ←
+          </button>
+        </div>
+        <h1 className="text-6xl font-bold text-left mb-8 font-jakarta">
+          Hiragana
         </h1>
-        <p className="text-2xl font-regular text-gray-500 text-center mb-8 font-jakarta">
+        <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
           Click on a card to flip it and see the romaji. Click the sound icon to
           hear pronunciation.
         </p>
