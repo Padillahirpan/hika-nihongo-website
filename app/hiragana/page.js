@@ -5,6 +5,7 @@ import HiraganaCard from "../../components/HiraganaCard";
 import EmptyCard from "../../components/EmptyCard";
 import { hiraganaData } from "../../data/hiraganaData";
 import { useRouter } from "next/navigation";
+import BackButton from "../../components/BackButton";
 
 export default function HiraganaPage() {
   const router = useRouter();
@@ -54,16 +55,12 @@ export default function HiraganaPage() {
     <main className="min-h-screen p-8 bg-gray-100">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <button
-            onClick={handleBackToHome}
-            className="bg-gray-200 hover:bg-gray-400 text-black h-10 w-10 lg:h-16 lg:w-16 rounded-full transition-colors"
-          >
-            ←
-          </button>
-        </div>
-        <h1 className="text-6xl font-bold text-left mb-8 font-jakarta">
-          Hiragana
+        <BackButton 
+          handleBackToHome={handleBackToHome}
+        />
+        
+        <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
+
         </h1>
         <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
           Click on a card to flip it and see the romaji. Click the sound icon to

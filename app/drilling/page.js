@@ -7,6 +7,7 @@ import formatDateTime from "../../util/DateFormat";
 import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
 import { getCurrentHiragana } from "../../util/getData";
+import BackButton from "../../components/BackButton";
 
 export default function Drilling() {
   const router = useRouter();
@@ -53,14 +54,15 @@ export default function Drilling() {
     }
     
     // Filter available hiragana based on threshold
-    const priorityHiragana = hiraganaData.filter(
+    const priorityHiragana = updatedHiraganaData.filter(
       item => item.hiragana !== " " && (item.masteryLevel || 0) < masteryThreshold
     );
     
+    console.log(`this is priorityHiragana: ${priorityHiragana.length}`);
     // If we don't have enough priority hiragana, include some higher mastery ones
     const availableHiragana = priorityHiragana.length >= 10 
       ? priorityHiragana 
-      : hiraganaData.filter(item => item.hiragana !== " " && item.masteryLevel < 100);
+      : updatedHiraganaData.filter(item => item.hiragana !== " " && item.masteryLevel < 100);
     
     for (let i = 0; i < 10; i++) {
       // Prioritize lower mastery characters with weighted random selection
@@ -278,12 +280,9 @@ export default function Drilling() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <button
-            onClick={handleBackToHome}
-            className="bg-gray-200 hover:bg-gray-400 text-black h-10 w-10 lg:h-16 lg:w-16 rounded-full transition-colors"
-          >
-            ←
-          </button>
+          <BackButton 
+            handleBackToHome={handleBackToHome}
+          />
         </div>
         
         <ProgressBar current={currentQuestion + 1} total={11} />
