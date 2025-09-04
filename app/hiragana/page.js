@@ -93,7 +93,7 @@ export default function HiraganaNewPage() {
           />
         </svg>
         <span className="sm:text-xl xl:text-2xl font-semibold">
-          Let's start Drilling
+          Let's start drilling
         </span>
       </button>
     </main>
