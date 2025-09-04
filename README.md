@@ -4,6 +4,20 @@
 
 Hiragana Drilling App is a web-based tool designed to help users improve their Hiragana character recognition skills. The app features a home page that displays all Hiragana characters in a grid format, with each character color-coded based on its mastery level. Users can click on a character to drill it, and receive immediate feedback on whether their answer was correct.
 
+## Feature Progress
+
+- Homepage ✅
+- Hiragana page ✅
+- Hiragana drill page ✅
+- Katakana page ⏳
+- Katakana drill page ⏳
+- Add kana data (Gojuon, Sokuon, Dakuon, Youon) ⏳
+- Vocabulary page ⏳
+- Vocabulary drill page ⏳
+- Settings page ⏳
+- About page ⏳
+- PWA ⏳
+
 ## Features in Detail
 
 ### Home Page
