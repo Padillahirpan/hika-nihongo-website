@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useSpeechSynthesis } from "../util/useSpeechSynthesis.js";
+import { useSpeechSynthesis } from "../util/use-speech-synthesis.js";
 
 /**
  * HiraganaCard Component
  *
  * @param {Object} props
- * @param {string} props.hiragana - The hiragana character to display
+ * @param {string} props.kana - The hiragana character to display
  * @param {string} props.romaji - The romaji (romanized) version of the hiragana
  * @param {number} props.masteryLevel - The mastery level (0-100) of this character
  */
-const HiraganaCard = ({ hiragana, romaji, masteryLevel = 0 }) => {
+const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const { supported, speak } = useSpeechSynthesis("ja-JP");
 
@@ -23,18 +23,17 @@ const HiraganaCard = ({ hiragana, romaji, masteryLevel = 0 }) => {
   //   // Function to pronounce the hiragana using Web Speech API
   const pronounceHiragana = (e) => {
     e.stopPropagation();
-    console.log(`this is pronounceHiragana: ${hiragana}`);
     if (!supported) {
       console.error("Web Speech API is not supported in this browser");
       return;
     }
-    speak(hiragana, {
+    speak(kana, {
       lang: "ja-JP",
-      rate: 0.9,
+      rate: 0.8,
       pitch: 1,
-      volume: 1,
+      volume: 5,
       voiceName: "Google 日本語", // optionally lock a specific voice
-      onStart: () => console.log("Pronouncing:", hiragana),
+      onStart: () => console.log("Pronouncing:", kana),
       onEnd: () => console.log("Done"),
       onError: (e) => console.error("TTS error:", e.error),
     });
@@ -44,10 +43,26 @@ const HiraganaCard = ({ hiragana, romaji, masteryLevel = 0 }) => {
   const getBackgroundColor = () => {
     if (masteryLevel === 0) return "bg-white";
     // if (masteryLevel >= 1 && masteryLevel <= 29) return "bg-green-100";
-    if (masteryLevel >= 1 && masteryLevel <= 29) return "bg-rose-100";
-    if (masteryLevel >= 30 && masteryLevel <= 90) return "bg-rose-300";
-    return "bg-rose-500"; // masteryLevel >= 60
+    if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100";
+    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-200";
+    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-300";
+    if (masteryLevel >= 60 && masteryLevel <= 89) return "bg-rose-400";
+    return "bg-rose-500"; // masteryLevel > 90
   };
+
+  if (!unlocked) {
+    return (
+      <div className="flex w-full h-[100px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
+        <div
+          className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200"
+        >
+          <span className="text-l sm:text-8xl font-bold text-gray-400 font-noto-jp">
+            {kana}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -66,7 +81,7 @@ const HiraganaCard = ({ hiragana, romaji, masteryLevel = 0 }) => {
           className={`flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden]`}
         >
           <span className="text-l sm:text-8xl font-bold text-gray-800 font-noto-jp">
-            {hiragana}
+            {kana}
           </span>
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
             <button

@@ -1,51 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import HiraganaCard from "../../components/HiraganaCard";
 import EmptyCard from "../../components/EmptyCard";
-import { hiraganaData } from "../../data/hiraganaData";
-import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
+import { useLocalStorage } from "../../hooks/user-local-storage";
+import { hiraganaDataNew } from "../../data/kana-data";
+import { checkUnlockConditions, getRowStatus } from "../../util/unlock-logic";
+import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 
-export default function HiraganaPage() {
+export default function HiraganaNewPage() {
   const router = useRouter();
-  const [updatedHiraganaData, setUpdatedHiraganaData] = useState(hiraganaData);
+
+  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);
+  const [dataKana, setDataKana] = useState(hiraganaDataNew);
+  const [rowStatus, setRowStatus] = useState({});
+
+  useEffect(() => {
+    // setDataKana(storedData);
+    const newData = checkUnlockConditions(storedData);
+    
+    if (newData !== storedData) {
+      setStoredData(newData);
+    }
+    
+    setDataKana(newData);
+    setRowStatus(getRowStatus(newData));
+  }, [storedData, setStoredData]);
 
   const handleBackToHome = () => {
     router.back();
   };
-
-  // Function to load mastery levels from localStorage
-  const loadMasteryLevels = () => {
-    const savedMasteryLevels = JSON.parse(
-      localStorage.getItem("hiraganaProgress") || "{}",
-    );
-
-    // Update hiraganaData with saved mastery levels
-    const updatedData = hiraganaData.map((item) => ({
-      ...item,
-      masteryLevel: savedMasteryLevels[item.romaji] || item.masteryLevel,
-    }));
-
-    setUpdatedHiraganaData(updatedData);
-  };
-
-  // Load saved mastery levels from localStorage on component mount
-  useEffect(() => {
-    loadMasteryLevels();
-
-    // Add event listener to reload data when window gains focus (user returns from drilling)
-    const handleFocus = () => {
-      loadMasteryLevels();
-    };
-
-    window.addEventListener("focus", handleFocus);
-
-    // Cleanup event listener
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, []);
 
   const handleDrillingClick = () => {
     router.push("/drilling");
@@ -60,7 +46,7 @@ export default function HiraganaPage() {
         />
         
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
-
+          Hiragana
         </h1>
         <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
           Click on a card to flip it and see the romaji. Click the sound icon to
@@ -68,13 +54,14 @@ export default function HiraganaPage() {
         </p>
 
         <div className="grid grid-cols-5 md:grid-cols-5 lg:grid-cols-5 gap-2 sm:gap-4">
-          {updatedHiraganaData.map((item, index) => (
+          {dataKana.map((item, index) => (
             <div key={index} className="flex justify-center">
-              {item.hiragana !== " " ? (
+              {item.character !== "-" ? (
                 <HiraganaCard
-                  hiragana={item.hiragana}
+                  kana={item.character}
                   romaji={item.romaji}
-                  masteryLevel={item.masteryLevel}
+                  masteryLevel={item.points}
+                  unlocked={item.unlocked}
                 />
               ) : (
                 <EmptyCard />

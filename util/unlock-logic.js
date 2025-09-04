@@ -1,0 +1,49 @@
+export const checkUnlockConditions = (kanaData) => {
+  const updatedData = [...kanaData];
+  const rows = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'n'];
+  let changed = false;
+
+  for (let i = 0; i < rows.length - 1; i++) {
+    const currentRow = rows[i];
+    const nextRow = rows[i + 1];
+    
+    // Periksa apakah baris berikutnya masih terkunci
+    const isNextRowLocked = updatedData.filter(k => k.row === nextRow && !k.unlocked).length > 0;
+    
+    if (!isNextRowLocked) continue;
+    
+    // Hitung total poin untuk baris saat ini
+    const currentRowKanas = updatedData.filter(k => k.row === currentRow);
+    const totalPoints = currentRowKanas.reduce((sum, kana) => sum + kana.points, 0);
+    const averagePoints = totalPoints / currentRowKanas.length;
+    
+    // Jika rata-rata poin mencapai 50, buka baris berikutnya
+    if (averagePoints >= 80) {
+      updatedData.forEach(kana => {
+        if (kana.row === nextRow) {
+          kana.unlocked = true;
+        }
+      });
+      changed = true;
+      console.log(`Unlocked ${nextRow} row!`);
+    }
+  }
+  
+  return changed ? updatedData : kanaData;
+};
+
+// Fungsi untuk mendapatkan status kunci berdasarkan baris
+export const getRowStatus = (kanaData) => {
+  const rows = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'n'];
+  const status = {};
+  
+  rows.forEach(row => {
+    const rowKanas = kanaData.filter(k => k.row === row);
+    status[row] = {
+      unlocked: rowKanas.every(k => k.unlocked),
+      averagePoints: rowKanas.reduce((sum, kana) => sum + kana.points, 0) / rowKanas.length
+    };
+  });
+  
+  return status;
+};

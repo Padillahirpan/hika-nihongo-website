@@ -2,15 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { hiraganaData } from "../../data/hiraganaData";
-import formatDateTime from "../../util/DateFormat";
+import formatDateTime from "../../util/date-format";
 import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
-import { getCurrentHiragana } from "../../util/getData";
 import BackButton from "../../components/BackButton";
+import { useLocalStorage } from "../../hooks/user-local-storage";
+import { hiraganaDataNew } from "../../data/kana-data";
+import { generatePrioritizedQuestions } from "../../util/question-generator";
+import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
+import { HIRAGANA_DATA_PROGRESS, DRILLING_RESULT } from "../../hooks/cons-storage";
 
-export default function Drilling() {
+export default function HiraganaDrilling() {
   const router = useRouter();
+  const { supported, speak } = useSpeechSynthesis("ja-JP");
+
+  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -19,129 +26,81 @@ export default function Drilling() {
   const [isFinished, setIsFinished] = useState(false);
   const [previousResults, setPreviousResults] = useState([]);
 
+  // Function to pronounce the hiragana using Web Speech API
+  const pronounceHiragana = (kana) => {
+    if (!supported) {
+      console.error("Web Speech API is not supported in this browser");
+      return;
+    }
+    speak(kana, {
+      lang: "ja-JP",
+      rate: 0.8,
+      pitch: 1,
+      volume: 5,
+      voiceName: "Google 日本語", // optionally lock a specific voice
+      onStart: () => console.log("Pronouncing:", kana),
+      onEnd: () => console.log("Done"),
+      onError: (e) => console.error("TTS error:", e.error),
+    });
+  };
+
+  const loadPreviousResults = () => {
+    const results = JSON.parse(localStorage.getItem(DRILLING_RESULT) || "[]");
+    // Get last 5 results
+    setPreviousResults(results.slice(-5).reverse());
+  };
+
+  const generateQuestions = async () => {
+    const updatedHiraganaData = storedData.filter(item => item.unlocked);
+    const newQuestions = generatePrioritizedQuestions(updatedHiraganaData, 10);
+      
+    setQuestions(newQuestions);
+  };
+
   // Generate random questions on component mount
   useEffect(() => {
     generateQuestions();
     loadPreviousResults();
   }, []);
 
-  const loadPreviousResults = () => {
-    const results = JSON.parse(localStorage.getItem("drillingResults") || "[]");
-    // Get last 5 results
-    setPreviousResults(results.slice(-5).reverse());
-  };
-
-  const generateQuestions = async () => {
-    const newQuestions = [];
-    
-    // Calculate overall progress
-    const updatedHiraganaData = await getCurrentHiragana();
-    
-    const totalMasteryLevels = updatedHiraganaData.reduce((sum, item) => sum + item.masteryLevel, 0);
-    const totalPossibleMastery = updatedHiraganaData.filter(item => item.hiragana !== " ").length * 100;
-    const overallProgress = (totalMasteryLevels / totalPossibleMastery) * 100;
-
-    console.log(`this is overall progress: ${overallProgress} and totalPossibleMastery: ${totalMasteryLevels} and ${totalPossibleMastery}`);
-    
-    // Set mastery threshold based on overall progress
-    let masteryThreshold;
-    if (overallProgress < 50) {
-      masteryThreshold = 50;  // Focus on getting everything to 50% first
-    } else if (overallProgress < 70) {
-      masteryThreshold = 70;  // Then focus on getting to 70%
-    } else {
-      masteryThreshold = 100; // Finally work on full mastery
-    }
-    
-    // Filter available hiragana based on threshold
-    const priorityHiragana = updatedHiraganaData.filter(
-      item => item.hiragana !== " " && (item.masteryLevel || 0) < masteryThreshold
-    );
-    
-    console.log(`this is priorityHiragana: ${priorityHiragana.length}`);
-    // If we don't have enough priority hiragana, include some higher mastery ones
-    const availableHiragana = priorityHiragana.length >= 10 
-      ? priorityHiragana 
-      : updatedHiraganaData.filter(item => item.hiragana !== " " && item.masteryLevel < 100);
-    
-    for (let i = 0; i < 10; i++) {
-      // Prioritize lower mastery characters with weighted random selection
-      const weightedIndex = Math.floor(Math.random() * availableHiragana.length);
-      const correctAnswer = availableHiragana[weightedIndex];
-    
-      // Generate 3 random incorrect answers
-      const incorrectAnswers = [];
-      while (incorrectAnswers.length < 3) {
-        const randomIncorrect = availableHiragana[
-          Math.floor(Math.random() * availableHiragana.length)
-        ];
-        if (
-          randomIncorrect.romaji !== correctAnswer.romaji &&
-          !incorrectAnswers.some(ans => ans.romaji === randomIncorrect.romaji)
-        ) {
-          incorrectAnswers.push(randomIncorrect);
-        }
+  const checkAnswer = () => {
+    if(selectedAnswer != null) {
+      setShowResult(true);
+      if (selectedAnswer.romaji === questions[currentQuestion].correctAnswer.romaji) {
+        setScore(score + 1);
+        // Update mastery level for correct answer
+        updateMasteryLevel(selectedAnswer, true);
+      } else {
+        // Update mastery level for incorrect answer
+        updateMasteryLevel(selectedAnswer, false);
       }
-    
-      // Combine and shuffle options
-      const options = [correctAnswer, ...incorrectAnswers];
-      const shuffledOptions = options.sort(() => Math.random() - 0.5);
-    
-      newQuestions.push({
-        hiragana: correctAnswer.hiragana,
-        correctRomaji: correctAnswer.romaji,
-        options: shuffledOptions,
-        correctIndex: shuffledOptions.findIndex(
-          opt => opt.romaji === correctAnswer.romaji
-        ),
-      });
     }
+  }
 
-    setQuestions(newQuestions);
+  const handleAnswerSelect = (selectedOption) => {
+    setSelectedAnswer(selectedOption);
+    pronounceHiragana(selectedOption.character);
   };
 
-  const handleAnswerSelect = (selectedIndex) => {
-    setSelectedAnswer(selectedIndex);
-    setShowResult(true);
+  const updateMasteryLevel = (kana, isCorrect) => {
+    // Update points in stored data
 
-    // Update score if correct
-    if (selectedIndex === questions[currentQuestion].correctIndex) {
-      setScore(score + 1);
-      // Update mastery level for correct answer
-      updateMasteryLevel(questions[currentQuestion].correctRomaji, true);
-    } else {
-      // Update mastery level for incorrect answer
-      updateMasteryLevel(questions[currentQuestion].correctRomaji, false);
-    }
-  };
+    const updatedData = storedData.map(item => {
+      let points = item.points;
 
-  const updateMasteryLevel = (romaji, isCorrect) => {
-    // Get current mastery levels from localStorage
-    const savedMasteryLevels = JSON.parse(
-      localStorage.getItem("hiraganaProgress") || "{}",
-    );
+      if (isCorrect) {
+        points = Math.min(100, item.points + 20);
+      } else {
+        points = Math.max(0, item.points - 5);
+      }
 
-    // Update mastery level
-    const currentLevel = savedMasteryLevels[romaji] || 0;
-    if (isCorrect) {
-      savedMasteryLevels[romaji] = Math.min(100, currentLevel + 20);
-    } else {
-      savedMasteryLevels[romaji] = Math.max(0, currentLevel - 5);
-    }
+      if (item.character === kana.character) {
+        return { ...item, points: points };
+      }
+      return item;
+    });
 
-    // Save back to localStorage
-    localStorage.setItem(
-      "hiraganaProgress",
-      JSON.stringify(savedMasteryLevels),
-    );
-
-    // Also update the hiraganaData array for immediate UI updates
-    const characterIndex = hiraganaData.findIndex(
-      (item) => item.romaji === romaji,
-    );
-    if (characterIndex !== -1) {
-      hiraganaData[characterIndex].masteryLevel = savedMasteryLevels[romaji];
-    }
+    setStoredData(updatedData);
   };
 
   const handleNextQuestion = () => {
@@ -149,6 +108,9 @@ export default function Drilling() {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+
+      pronounceHiragana(questions[currentQuestion + 1].correctAnswer.character);
+
     } else {
       setIsFinished(true);
       saveDrillingResult();
@@ -166,7 +128,7 @@ export default function Drilling() {
 
     // Get existing results from localStorage
     const existingResults = JSON.parse(
-      localStorage.getItem("drillingResults") || "[]",
+      localStorage.getItem(DRILLING_RESULT) || "[]",
     );
 
     // Add new result
@@ -178,14 +140,14 @@ export default function Drilling() {
     }
 
     // Save back to localStorage
-    localStorage.setItem("drillingResults", JSON.stringify(existingResults));
+    localStorage.setItem(DRILLING_RESULT, JSON.stringify(existingResults));
 
     // Update previous results display
     loadPreviousResults();
   };
 
   const handleBackToHome = () => {
-    router.back();
+    router.push('/');
   };
 
   const handleRestartDrilling = () => {
@@ -276,11 +238,12 @@ export default function Drilling() {
   const currentQ = questions[currentQuestion];
 
   return (
-    <div className=" bg-red p-8">
+    <div className="p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-4">
           <BackButton 
+            isClose={true}
             handleBackToHome={handleBackToHome}
           />
         </div>
@@ -289,13 +252,23 @@ export default function Drilling() {
         
         {/* Question Card */}
         <div className="min-h-full items-center justify-center">
-          <h2 className="text-xl sm:text-2xl font-medium my-4 font-jakarta">
-              Select the correct one?
-            </h2>
-          <div className="w-full h-full bg-yellow rounded-lg shadow-sm p-8 mb-8">
-            
-            <div className="text-8xl text-center mb-8 font-bold text-sky-900">
-              {currentQ.hiragana}
+          <div className="text-xl sm:text-2xl my-4 text-gray-900 font-jakarta">
+            Select the correct one?
+          </div>
+          <div className="w-full h-full items-center justify-center rounded-lg shadow-sm p-2">
+            <div className="w-full h-lg flex items-center justify-center text-xl text-center p-4 mb-4 font-bold text-sky-900">
+              <button
+                  // onClick={pronounceHiragana(currentQ.question)}
+                  className="group flex w-fit h-[100px] sm:w-[100px] sm:h-[100px] justify-center items-center 
+                    gap-6 px-12 py-4 bg-rose-500 text-white font-mono font-semibold text-2xl relative overflow-hidden 
+                    rounded-xl border-4 border-black hover:border-rose-500 shadow-[4px_8px_0px_#000] 
+                    hover:shadow-[0px_0px_0px_#000] transition-all duration-200 uppercase"
+                  aria-label="Pronounce"
+                >
+                <div className="relative transition-all duration-200">
+                  <span className="inline-block transition-all duration-200 font-noto-jp">{ currentQ.question }</span>
+                </div>
+              </button>
             </div>
 
             {/* Answer Options */}
@@ -305,17 +278,37 @@ export default function Drilling() {
               selectedAnswer={selectedAnswer}
               handleAnswerSelect={handleAnswerSelect}
             />
+            
+            {
+              !showResult && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={checkAnswer}
+                    className={`w-full rounded-lg opacity-95 ${
+                      selectedAnswer == null 
+                      ? 'bg-gray-300 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-green-200 to-green-400 hover:from-green-400 hover:to-green-500 transition-all duration-300 hover:scale-105 z-50'
+                      } text-white px-6 py-4 shadow-lg  flex items-center justify-center space-x-2`}
+                    aria-label="Start Drilling"
+                  >
+                    <span className="text-sm xl:text-l font-semibold">
+                      Check
+                    </span>
+                  </button>
+                </div>
+              )
+            }
 
             {/* Result and Next Button */}
             {showResult && (
               <div className="mt-6 text-center">
-                {selectedAnswer !== currentQ.correctIndex ? (
+                {selectedAnswer.romaji !== currentQ.correctAnswer.romaji ? (
                   <div>
                     <p className="text-red-600 font-bold">
                       Incorrect. 
                     </p>
                     <p className="text-red-600 font-bold">
-                      The correct answer is: {currentQ.correctRomaji}
+                      The correct answer is: { currentQ.type == 'romajiToKana' ? currentQ.correctAnswer.character : currentQ.correctAnswer.romaji }
                     </p>
                   </div>
                 ) : (
@@ -325,7 +318,7 @@ export default function Drilling() {
                 <button
                   onClick={handleNextQuestion}
                   className={`w-full mt-4 bg-gradient-to-r ${
-                    selectedAnswer === currentQ.correctIndex 
+                    selectedAnswer.romaji === currentQ.correctAnswer.romaji 
                       ? "from-green-400 to-green-600 hover:from-green-600 hover:to-green-700"
                       : "from-rose-400 to-rose-600 hover:from-rose-600 hover:to-rose-700"
                   } text-white px-6 py-4 shadow-lg transition-all duration-300 rounded-lg text-sm font-jakarta`}

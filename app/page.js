@@ -2,60 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { hiraganaData } from '../data/hiraganaData';
 import BubbleGradient from '../components/BubbleGradient';
+import ProgressBar from '../components/ProgressBar';
+import { welcomeText } from '../data/welcome-data';
+import { HIRAGANA_DATA_PROGRESS } from '../hooks/cons-storage';
+import { getCurrentHiragnaProgress } from '../hooks/user-local-storage';
 
 export default function HomePage() {
-  const [masteredCount, setMasteredCount] = useState(0);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showText, setShowText] = useState(true);
-  const totalHiragana = hiraganaData.filter(char => char.hiragana !== ' ').length;
-
-  const animatedTexts = [
-    {
-      japanese: "おはようございます 🌞",
-      english: "Good Morning!"
-    },
-    {
-      japanese: "こんにちは 👋",
-      english: "Hello!"
-    },
-    {
-      japanese: "がんばりましょう ✨",
-      english: "Let's do our best!"
-    },
-    {
-      japanese: "ようこそ 🎉",
-      english: "Welcome!"
-    },
-    {
-      japanese: "いっしょにべんきょうしましょう 📚",
-      english: "Let's study together!"
-    }
-  ];
-
-  useEffect(() => {
-    // Count mastered hiragana from localStorage
-    try {
-      const savedProgress = localStorage.getItem('hiraganaProgress');
-      if (savedProgress) {
-        const parsedProgress = JSON.parse(savedProgress);
-        const mastered = typeof parsedProgress === 'object'
-          ? Object.values(parsedProgress).filter(level => level >= 100).length
-          : 0;
-        setMasteredCount(mastered);
-      }
-    } catch (error) {
-      console.error("Failed to load mastery data:", error);
-      setMasteredCount(0);
-    }
-  }, []);
+  
+  const { masteredHiragana, totalHiragana } = getCurrentHiragnaProgress(HIRAGANA_DATA_PROGRESS);
 
   useEffect(() => {
     const textInterval = setInterval(() => {
       setShowText(false);
       setTimeout(() => {
-        setCurrentTextIndex((prevIndex) => (prevIndex + 1) % animatedTexts.length);
+        setCurrentTextIndex((prevIndex) => (prevIndex + 1) % welcomeText.length);
         setShowText(true);
       }, 2000);
     }, 6000);
@@ -73,10 +36,10 @@ export default function HomePage() {
           {showText && (
             <>
               <div className="typewriter text-xl text-gray-800 font-noto-jp mb-2">
-                {animatedTexts[currentTextIndex].japanese}
+                {welcomeText[currentTextIndex].japanese}
               </div>
               <div className="text-gray-600 mt-1">
-                {animatedTexts[currentTextIndex].english}
+                {welcomeText[currentTextIndex].english}
               </div>
             </>
           )}
@@ -87,9 +50,21 @@ export default function HomePage() {
         <div className="flex flex-col w-11/12 max-w-4xl gap-4 items-center">
           <Link
             href="/hiragana"
-            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-6 py-4 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
+            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
           >
-            Hiragana <span className="font-semibold">{masteredCount}/{totalHiragana}</span>
+            <div className='flex flex-col'>
+              <div className='text-xl font-bold'>Hiragana</div>
+              <div className='flex flex-row items-center mt-2 justify-center gap-2'>
+                  <ProgressBar 
+                    current={masteredHiragana}
+                    total={totalHiragana}
+                    baseColor={"bg-gray-200"}
+                    progressColor={"bg-rose-500"}
+                    size={0}
+                  />
+                  <div className='text-sm'>{masteredHiragana}/{totalHiragana}</div>
+                </div>
+            </div>
           </Link>
           <Link
             href="/drilling"
