@@ -2,19 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
-import { hiraganaDataNew, hiraganaDakuon, hiraganaYouon } from "../../data/kana-data";
-import { HIRAGANA_DATA_PROGRESS, HIRAGANA_DAKUON_DATA_PROGRESS, HIRAGANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
 import { DakuonSection } from "../../components/DakuonSection";
+import { KanaSection } from "../../components/kana-section";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
 import { YouonSection } from "../../components/YouonSection";
-import { KanaSection } from "../../components/kana-section";
+import { katakanaDakuon, katakanaDataNew, katakanaYouon } from "../../data/katakana-data";
+import { KATAKANA_DATA_PROGRESS, KATAKANA_DAKUON_DATA_PROGRESS, KATAKANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
 
-export default function HiraganaPage() {
+export default function KatakanaPage() {
   const router = useRouter();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);
-  const [dataDakuon, setDataDakuon] = getLocalHiraganaData(HIRAGANA_DAKUON_DATA_PROGRESS, hiraganaDakuon);
-  const [dataYouon, setDataYouon] = getLocalHiraganaData(HIRAGANA_YOUON_DATA_PROGRESS, hiraganaYouon);
+  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, katakanaDataNew);
+  const [dataDakuon, setDataDakuon] = getLocalHiraganaData(KATAKANA_DAKUON_DATA_PROGRESS, katakanaDakuon);
+  const [dataYouon, setDataYouon] = getLocalHiraganaData(KATAKANA_YOUON_DATA_PROGRESS, katakanaYouon);
     
 
   const handleBackToHome = () => {
@@ -22,7 +22,7 @@ export default function HiraganaPage() {
   };
 
   const handleDrillingClick = () => {
-    router.push("/drilling");
+    router.push("/katakana-drill");
   };
 
   return (
@@ -34,7 +34,7 @@ export default function HiraganaPage() {
         />
         
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
-          Hiragana
+          Katakana
         </h1>
         <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
           Click on a card to flip it and see the romaji. Click the sound icon to
@@ -42,7 +42,7 @@ export default function HiraganaPage() {
         </p>
 
         <KanaSection
-          title="Hiragana"
+          title="Katakana"
           data={dataKana}
         />
 
