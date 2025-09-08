@@ -32,8 +32,6 @@ export default function HomePage() {
     <div className="min-h-screen">
       <BubbleGradient/>
 
-      
-
       <div className="relative flex flex-col items-center justify-center min-h-screen p-4">
         <div className='relative items-center justify-center text-center'>
           <h1 className="text-6xl font-bold text-gray-800 mb-6 text-center font-noto-jp">HikaGo Nihongo N5</h1>
