@@ -7,17 +7,17 @@ import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
 import BackButton from "../../components/BackButton";
 import { useLocalStorage } from "../../hooks/user-local-storage";
-import { hiraganaDataNew } from "../../data/kana-data";
+import { katakanaDataNew } from "../../data/katakana-data";
 import { generatePrioritizedQuestions } from "../../util/question-generator";
 import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
-import { HIRAGANA_DATA_PROGRESS, DRILLING_RESULT } from "../../hooks/cons-storage";
+import { KATAKANA_DATA_PROGRESS, DRILLING_RESULT } from "../../hooks/cons-storage";
 import { testType } from "../../data/kana-data";
 
-export default function HiraganaDrilling() {
+export default function KatakanaDrilling() {
   const router = useRouter();
   const { supported, speak } = useSpeechSynthesis("ja-JP");
 
-  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);  
+  const [storedData, setStoredData] = useLocalStorage(KATAKANA_DATA_PROGRESS, katakanaDataNew);  
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -52,8 +52,8 @@ export default function HiraganaDrilling() {
   };
 
   const generateQuestions = async () => {
-    const updatedHiraganaData = storedData.filter(item => item.unlocked);
-    const newQuestions = generatePrioritizedQuestions(updatedHiraganaData, 10);
+    const updatedKatakanaData = storedData.filter(item => item.unlocked);
+    const newQuestions = generatePrioritizedQuestions(updatedKatakanaData, 10);
       
     setQuestions(newQuestions);
   };
@@ -125,7 +125,7 @@ export default function HiraganaDrilling() {
       percentage: Math.round((score / 10) * 100),
       date: new Date().toISOString(),
       timestamp: Date.now(),
-      type: testType.HIRAGANA.toString(),
+      type: testType.KATAKANA.toString(),
     };
 
     // Get existing results from localStorage

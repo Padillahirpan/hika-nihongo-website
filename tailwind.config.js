@@ -20,6 +20,7 @@ module.exports = {
           white: "#FFFFFF",    // Background White
           vermilion: "#E60026",// Accent Red
           softgrey: "#F5F5F5", // Neutral Grey
+          "white-off": "#FFFAFA",   // Use kebab-case for consistency
         }
       },
       animation: {
