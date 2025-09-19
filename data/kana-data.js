@@ -161,3 +161,13 @@ export const hiraganaYouon = [
     { character: "ぴゅ", romaji: "pyu", row: "pya", points: 0, unlocked: false, category: 5 },
     { character: "ぴょ", romaji: "pyo", row: "pya", points: 0, unlocked: false, category: 5 },
 ]
+
+export const getAllHiragana = () => {
+  const kanas = [
+    ...hiraganaDataNew,
+    // ...hiraganaSokuon, 
+    ...hiraganaDakuon, 
+    ...hiraganaYouon];
+
+  return kanas
+}

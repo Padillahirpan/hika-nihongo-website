@@ -30,10 +30,14 @@ export const getCurrentKanaProgress = (key) => {
         const parsed = JSON.parse(stored);
 
         // hitung dataA (point > 80)
-        const passedKana = parsed.filter(item => item.points >= 80).length;
+        const passedKana = parsed
+          .filter(item => item.character !== '-')
+          .filter(item => item.points >= 80).length;
 
         // hitung dataB (total data)
-        const totalKana = parsed.length;
+        const totalKana = parsed
+          .filter(item => item.character !== '-')
+          .length;
 
         setData({ masteredKana: passedKana, totalKana: totalKana });
       }
@@ -72,15 +76,14 @@ export const getCurrentDakuonProgress = (key) => {
 }
 
 export const getLocalHiraganaData = (key, initialValue) => {
-  const [value, setValue] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedValue = window.localStorage.getItem(key);
-      return storedValue ? JSON.parse(storedValue) : initialValue;
-    }
-    return initialValue;
-  });
+  // Always start with initialValue to prevent hydration mismatch
+  const [value, setValue] = useState(initialValue);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    // Mark as hydrated and load from localStorage
+    setIsHydrated(true);
+    
     try {
       const storedValue = window.localStorage.getItem(key);
       if (storedValue) {
@@ -90,14 +93,29 @@ export const getLocalHiraganaData = (key, initialValue) => {
         if (changed) {
           window.localStorage.setItem(key, JSON.stringify(data));
           setValue(data);
+        } else {
+          setValue(parsed);
         }
       } else {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        window.localStorage.setItem(key, JSON.stringify(initialValue));
+        setValue(initialValue);
       }
     } catch (err) {
       console.error("Error parsing localStorage data:", err);
+      setValue(initialValue);
     }
   }, [key]);
+
+  // Update localStorage when value changes (but only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (err) {
+        console.error("Error saving to localStorage:", err);
+      }
+    }
+  }, [key, value, isHydrated]);
 
   return [value, setValue];
 }

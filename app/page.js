@@ -67,15 +67,20 @@ export default function HomePage() {
             <div className='flex flex-col'>
               <div className='text-xl font-bold font-jakarta'>Hiragana</div>
               <div className='flex flex-row items-center mt-2 justify-center gap-2'>
-                  <ProgressBar 
-                    current={hiraganaKana}
-                    total={hiraganaTotal}
-                    baseColor={"bg-gray-200"}
-                    progressColor={"bg-rose-500"}
-                    size={0}
-                  />
-                  <div className='text-sm'>{hiraganaKana}/{hiraganaTotal}</div>
-                </div>
+                {hiraganaTotal > 0 && (
+                  <>
+                    <ProgressBar 
+                      current={hiraganaKana}
+                      total={hiraganaTotal}
+                      baseColor={"bg-gray-200"}
+                      progressColor={"bg-rose-500"}
+                      size={0}
+                    />
+                    <div className='text-sm'>{hiraganaKana}/{hiraganaTotal}</div>
+                  </>
+                )
+                }
+              </div>
             </div>
           </Link>
           <Link
@@ -85,15 +90,20 @@ export default function HomePage() {
             <div className='flex flex-col'>
               <div className='text-xl font-bold'>Katakana</div>
               <div className='flex flex-row items-center mt-2 justify-center gap-2'>
-                  <ProgressBar 
-                    current={katakanaKana}
-                    total={katakanaTotal}
-                    baseColor={"bg-gray-200"}
-                    progressColor={"bg-rose-500"}
-                    size={0}
-                  />
-                  <div className='text-sm'>{katakanaKana}/{katakanaTotal}</div>
-                </div>
+                {katakanaTotal > 0 && (
+                  <>
+                    <ProgressBar 
+                      current={katakanaKana}
+                      total={katakanaTotal}
+                      baseColor={"bg-gray-200"}
+                      progressColor={"bg-rose-500"}
+                      size={0}
+                    />
+                    <div className='text-sm'>{katakanaKana}/{katakanaTotal}</div>
+                  </>
+                )
+                }
+              </div>
             </div>
           </Link>
         </div>

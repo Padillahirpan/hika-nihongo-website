@@ -1,6 +1,9 @@
 export const checkUnlockConditions = (kanaData) => {
   const updatedData = [...kanaData];
-  const rows = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'n'];
+  const rows = ['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa', 'n', 
+    'sokuon', 'ga', 'za', 'da', 'ba', 'pa', 
+    'kya', 'sha', 'cha', 'nya', 'rya', 'gya', 'ja', 'bya', 'pya',
+  ];
   let changed = false;
 
   for (let i = 0; i < rows.length - 1; i++) {
@@ -50,4 +53,15 @@ export const getRowStatus = (kanaData) => {
   });
   
   return status;
+};
+
+export const groupByCategory = (data) => {
+  return data.reduce((groups, item) => {
+    const category = item.category;
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+    groups[category].push(item);
+    return groups;
+  }, {});
 };

@@ -6,16 +6,13 @@ import { DakuonSection } from "../../components/DakuonSection";
 import { KanaSection } from "../../components/kana-section";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
 import { YouonSection } from "../../components/YouonSection";
-import { katakanaDakuon, katakanaDataNew, katakanaYouon } from "../../data/katakana-data";
+import { getAllKatakana, katakanaDakuon, katakanaDataNew, katakanaYouon } from "../../data/katakana-data";
 import { KATAKANA_DATA_PROGRESS, KATAKANA_DAKUON_DATA_PROGRESS, KATAKANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
 
 export default function KatakanaPage() {
   const router = useRouter();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, katakanaDataNew);
-  const [dataDakuon, setDataDakuon] = getLocalHiraganaData(KATAKANA_DAKUON_DATA_PROGRESS, katakanaDakuon);
-  const [dataYouon, setDataYouon] = getLocalHiraganaData(KATAKANA_YOUON_DATA_PROGRESS, katakanaYouon);
-    
+  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, getAllKatakana());    
 
   const handleBackToHome = () => {
     router.back();
@@ -44,20 +41,6 @@ export default function KatakanaPage() {
         <KanaSection
           title="Katakana"
           data={dataKana}
-        />
-
-        <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
-        <DakuonSection
-          title="Dakuon"
-          data={dataDakuon}
-        />
-
-        <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
-        <YouonSection
-          title="Youon"
-          data={dataYouon}
         />
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
