@@ -2,11 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
-import { hiraganaDataNew, hiraganaDakuon, hiraganaYouon, getAllHiragana } from "../../data/kana-data";
-import { HIRAGANA_DATA_PROGRESS, HIRAGANA_DAKUON_DATA_PROGRESS, HIRAGANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
-import { DakuonSection } from "../../components/DakuonSection";
+import { getAllHiragana } from "../../data/kana-data";
+import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
-import { YouonSection } from "../../components/YouonSection";
 import { KanaSection } from "../../components/kana-section";
 import { useEffect } from "react";
 

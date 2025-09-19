@@ -2,12 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
-import { DakuonSection } from "../../components/DakuonSection";
 import { KanaSection } from "../../components/kana-section";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
-import { YouonSection } from "../../components/YouonSection";
-import { getAllKatakana, katakanaDakuon, katakanaDataNew, katakanaYouon } from "../../data/katakana-data";
-import { KATAKANA_DATA_PROGRESS, KATAKANA_DAKUON_DATA_PROGRESS, KATAKANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
+import { getAllKatakana} from "../../data/katakana-data";
+import { KATAKANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 
 export default function KatakanaPage() {
   const router = useRouter();
