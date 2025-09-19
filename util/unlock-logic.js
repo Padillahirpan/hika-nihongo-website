@@ -16,9 +16,9 @@ export const checkUnlockConditions = (kanaData) => {
     const currentRowKanas = updatedData.filter(k => k.row === currentRow);
     const totalPoints = currentRowKanas.reduce((sum, kana) => sum + kana.points, 0);
     const averagePoints = totalPoints / currentRowKanas.length;
-    
-    // Jika rata-rata poin mencapai 50, buka baris berikutnya
-    if (averagePoints >= 80) {
+  
+    // Jika rata-rata poin mencapai 70, buka baris berikutnya
+    if (averagePoints >= 70) {
       updatedData.forEach(kana => {
         if (kana.row === nextRow) {
           kana.unlocked = true;
@@ -28,8 +28,12 @@ export const checkUnlockConditions = (kanaData) => {
       console.log(`Unlocked ${nextRow} row!`);
     }
   }
-  
-  return changed ? updatedData : kanaData;
+
+  if (changed) {
+    return { data: [...updatedData], changed: true };
+  } else {
+    return { data: [...kanaData], changed: false };
+  }
 };
 
 // Fungsi untuk mendapatkan status kunci berdasarkan baris

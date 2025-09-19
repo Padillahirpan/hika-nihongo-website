@@ -54,7 +54,7 @@ export default function HiraganaDrilling() {
   const generateQuestions = async () => {
     const updatedHiraganaData = storedData.filter(item => item.unlocked);
     const newQuestions = generatePrioritizedQuestions(updatedHiraganaData, 10);
-      
+    
     setQuestions(newQuestions);
   };
 

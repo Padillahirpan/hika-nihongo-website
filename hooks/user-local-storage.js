@@ -85,10 +85,11 @@ export const getLocalHiraganaData = (key, initialValue) => {
       const storedValue = window.localStorage.getItem(key);
       if (storedValue) {
         const parsed = JSON.parse(storedValue);
-        const newData = checkUnlockConditions(parsed);
+        const { data, changed } = checkUnlockConditions(parsed);
 
-        if (newData !== parsed) {
-          setValue(newData);
+        if (changed) {
+          window.localStorage.setItem(key, JSON.stringify(data));
+          setValue(data);
         }
       } else {
         window.localStorage.setItem(key, JSON.stringify(value));
@@ -96,7 +97,7 @@ export const getLocalHiraganaData = (key, initialValue) => {
     } catch (err) {
       console.error("Error parsing localStorage data:", err);
     }
-  }, [key, value]);
+  }, [key]);
 
   return [value, setValue];
 }
