@@ -154,3 +154,12 @@ export const katakanaYouon = [
     { character: "ピュ", romaji: "pyu", row: "pya", points: 0, unlocked: false, category: 5 },
     { character: "ピョ", romaji: "pyo", row: "pya", points: 0, unlocked: false, category: 5 },
 ]
+
+export const getAllKatakana = () => {
+  const kanas = [
+    ...katakanaDataNew,
+    // ...katakanaSokuon, 
+    ...katakanaDakuon, 
+    ...katakanaYouon];
+  return kanas;
+}

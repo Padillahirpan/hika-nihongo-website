@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSpeechSynthesis } from "../util/use-speech-synthesis.js";
 
 /**
@@ -13,7 +13,12 @@ import { useSpeechSynthesis } from "../util/use-speech-synthesis.js";
  */
 const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { supported, speak } = useSpeechSynthesis("ja-JP");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Function to handle card flip
   const handleCardFlip = () => {
@@ -41,20 +46,25 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
 
   // Determine background color based on mastery level
   const getBackgroundColor = () => {
+    // During SSR, return a safe default to prevent hydration mismatch
+    if (!isMounted) return "bg-white";
+    
     if (masteryLevel === 0) return "bg-white";
-    // if (masteryLevel >= 1 && masteryLevel <= 29) return "bg-green-100";
     if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100";
     if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-200";
-    if (masteryLevel >= 50 && masteryLevel <= 59) return "bg-rose-300";
+    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-300";
     if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-400";
-    return "bg-rose-600"; // masteryLevel > 90
+    return "bg-rose-600"; // masteryLevel >= 80
   };
 
-  // Determine background color based on mastery level
+  // Determine text color based on mastery level
   const getTextColor = () => {
+    // During SSR, return a safe default to prevent hydration mismatch
+    if (!isMounted) return "text-rose-800";
+    
     if (masteryLevel < 20) return "text-rose-800";
     if (masteryLevel < 40) return "text-rose-600";
-    return "text-white"; // masteryLevel > 90
+    return "text-white"; // masteryLevel >= 40
   };
 
   if (!unlocked) {
@@ -63,7 +73,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
         <div
           className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200"
         >
-          <span className="text-l sm:text-8xl font-bold text-gray-400 font-noto-jp">
+          <span className="text-lg sm:text-8xl font-bold text-gray-400 font-noto-jp">
             {kana}
           </span>
         </div>
@@ -87,7 +97,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
         <div
           className={`flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden]`}
         >
-          <span className={`text-l sm:text-8xl font-bold ${getTextColor()} font-noto-jp`}>
+          <span className={`text-lg sm:text-8xl font-bold ${getTextColor()} font-noto-jp`}>
             {kana}
           </span>
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
@@ -118,7 +128,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
         <div
           className={`absolute w-full h-full flex items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden] [transform:rotateY(180deg)]`}
         >
-          <span className={`text-l sm:text-4xl font-bold ${getTextColor()} font-noto-jp`}>
+          <span className={`text-lg sm:text-4xl font-bold ${getTextColor()} font-noto-jp`}>
             {romaji}
           </span>
         </div>

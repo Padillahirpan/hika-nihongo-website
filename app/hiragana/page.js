@@ -2,20 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
-import { hiraganaDataNew, hiraganaDakuon, hiraganaYouon } from "../../data/kana-data";
-import { HIRAGANA_DATA_PROGRESS, HIRAGANA_DAKUON_DATA_PROGRESS, HIRAGANA_YOUON_DATA_PROGRESS } from "../../hooks/cons-storage";
-import { DakuonSection } from "../../components/DakuonSection";
+import { getAllHiragana } from "../../data/kana-data";
+import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
-import { YouonSection } from "../../components/YouonSection";
 import { KanaSection } from "../../components/kana-section";
+import { useEffect } from "react";
 
 export default function HiraganaPage() {
   const router = useRouter();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);
-  const [dataDakuon, setDataDakuon] = getLocalHiraganaData(HIRAGANA_DAKUON_DATA_PROGRESS, hiraganaDakuon);
-  const [dataYouon, setDataYouon] = getLocalHiraganaData(HIRAGANA_YOUON_DATA_PROGRESS, hiraganaYouon);
+  const [dataKana, setDataKana] = getLocalHiraganaData(HIRAGANA_DATA_PROGRESS, getAllHiragana());
     
+  useEffect(() => {
+    const allKana = getAllHiragana();
+    console.log('this is all kana: ', allKana.length);
+  }, [])
 
   const handleBackToHome = () => {
     router.back();
@@ -44,20 +45,6 @@ export default function HiraganaPage() {
         <KanaSection
           title="Hiragana"
           data={dataKana}
-        />
-
-        <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
-        <DakuonSection
-          title="Dakuon"
-          data={dataDakuon}
-        />
-
-        <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
-        <YouonSection
-          title="Youon"
-          data={dataYouon}
         />
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />

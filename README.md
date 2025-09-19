@@ -9,9 +9,9 @@ Hiragana Drilling App is a web-based tool designed to help users improve their H
 - Homepage ✅
 - Hiragana page ✅
 - Hiragana drill page ✅
-- Katakana page ⏳
-- Katakana drill page ⏳
-- Add kana data (Gojuon, Sokuon, Dakuon, Youon) ⏳
+- Katakana page ✅
+- Katakana drill page ✅
+- Add kana data (Gojuon, Sokuon, Dakuon, Youon) ✅
 - Vocabulary page ⏳
 - Vocabulary drill page ⏳
 - Settings page ⏳

@@ -7,7 +7,7 @@ import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
 import BackButton from "../../components/BackButton";
 import { useLocalStorage } from "../../hooks/user-local-storage";
-import { hiraganaDataNew } from "../../data/kana-data";
+import { getAllHiragana } from "../../data/kana-data";
 import { generatePrioritizedQuestions } from "../../util/question-generator";
 import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
 import { HIRAGANA_DATA_PROGRESS, DRILLING_RESULT } from "../../hooks/cons-storage";
@@ -17,7 +17,7 @@ export default function HiraganaDrilling() {
   const router = useRouter();
   const { supported, speak } = useSpeechSynthesis("ja-JP");
 
-  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, hiraganaDataNew);  
+  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, getAllHiragana());  
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -54,7 +54,7 @@ export default function HiraganaDrilling() {
   const generateQuestions = async () => {
     const updatedHiraganaData = storedData.filter(item => item.unlocked);
     const newQuestions = generatePrioritizedQuestions(updatedHiraganaData, 10);
-      
+    
     setQuestions(newQuestions);
   };
 
@@ -90,7 +90,7 @@ export default function HiraganaDrilling() {
       let points = item.points;
 
       if (isCorrect) {
-        points = Math.min(100, item.points + 20);
+        points = Math.min(100, item.points + 30);
       } else {
         points = Math.max(0, item.points - 5);
       }
