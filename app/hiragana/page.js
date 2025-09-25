@@ -37,7 +37,7 @@ export default function HiraganaPage() {
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
           Hiragana
         </h1>
-        <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
+        <p className="text-l font-regular text-gray-500 text-left mb-2 font-jakarta">
           Click on a card to flip it and see the romaji. Click the sound icon to
           hear pronunciation.
         </p>
