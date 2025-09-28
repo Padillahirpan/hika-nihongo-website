@@ -6,11 +6,13 @@ import { KanaSection } from "../../components/kana-section";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
 import { getAllKatakana} from "../../data/katakana-data";
 import { KATAKANA_DATA_PROGRESS } from "../../hooks/cons-storage";
+import { useLanguage } from '../../contexts/language-context';
 
 export default function KatakanaPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, getAllKatakana());    
+  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, getAllKatakana());  
 
   const handleBackToHome = () => {
     router.back();
@@ -31,10 +33,14 @@ export default function KatakanaPage() {
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
           Katakana
         </h1>
-        <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
-          Click on a card to flip it and see the romaji. Click the sound icon to
-          hear pronunciation.
-        </p>
+        <div className="w-full bg-rose-300 p-4 rounded-lg mb-4 flex flex-col justify-center" >
+          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+          {t('instructions.flip')}
+          </p>
+          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+            {t('instructions.sound')}
+          </p>
+        </div>
 
         <KanaSection
           title="Katakana"
