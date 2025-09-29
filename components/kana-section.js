@@ -56,7 +56,7 @@ export const KanaSection = ({ title, data }) => {
       {categories.map((category, index) => (
         <div key={category.key}>
           <div className="flex items-center gap-1 mb-2">
-            <h2 className="text-lg sm:text-3xl font-bold text-left font-jakarta">{category.title}</h2>
+            <h2 className="text-lg sm:text-3xl font-bold text-left font-jakarta text-gray-800 dark:text-gray-100">{category.title}</h2>
             <button
               onClick={() => {
                 // Show popup with category information
@@ -71,7 +71,7 @@ export const KanaSection = ({ title, data }) => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-4 h-4 md:w-6 md:h-6"
+                className="w-4 h-4 md:w-6 md:h-6 text-gray-800 dark:text-gray-100"
               >
                 <path
                   strokeLinecap="round"

@@ -23,21 +23,21 @@ export default function HiraganaPage() {
   };
 
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen p-8 bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <BackButton 
           handleBackToHome={handleBackToHome}
         />
         
-        <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
+        <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta text-gray-800 dark:text-gray-100">
           Hiragana
         </h1>
-        <div className="w-full bg-rose-300 p-4 rounded-lg mb-4 flex flex-col justify-center" >
-          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+        <div className="w-full bg-rose-300 dark:bg-rose-400 p-4 rounded-lg mb-4 flex flex-col justify-center" >
+          <p className="text-l font-regular text-white text-left font-jakarta">
           {t('instructions.flip')}
           </p>
-          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+          <p className="text-l font-regular text-white text-left font-jakarta">
             {t('instructions.sound')}
           </p>
         </div>
