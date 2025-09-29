@@ -1,6 +1,8 @@
 const QUESTION_TYPES = {
   ROMAJI_TO_KANA: 'romajiToKana',
   KANA_TO_ROMAJI: 'kanaToRomaji',
+  SOUND_TO_KANA: 'soundToKana',
+  KANA_TO_SOUND: 'kanaToSound',
 };
 
 export const generatePrioritizedQuestions = (kanaData, count = 10) => {
@@ -98,8 +100,14 @@ export const generatePrioritizedQuestions = (kanaData, count = 10) => {
   
   // Buat soal untuk setiap kana yang terpilih
   const questions = selectedKanas.map(correctKana => {
-    // Tentukan jenis pertanyaan (romaji ke kana atau sebaliknya)
-    const questionType = Math.random() > 0.5 ? QUESTION_TYPES.ROMAJI_TO_KANA : QUESTION_TYPES.KANA_TO_ROMAJI;
+    // Tentukan jenis pertanyaan secara acak dari semua tipe yang tersedia
+    const questionTypes = [
+      QUESTION_TYPES.ROMAJI_TO_KANA,
+      QUESTION_TYPES.KANA_TO_ROMAJI,
+      QUESTION_TYPES.SOUND_TO_KANA,
+      QUESTION_TYPES.KANA_TO_SOUND
+    ];
+    const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
     
     // Dapatkan 4 kana lain sebagai opsi salah
     const wrongOptions = unlockedKanas
@@ -112,7 +120,19 @@ export const generatePrioritizedQuestions = (kanaData, count = 10) => {
     
     return {
       type: questionType,
-      question: questionType === QUESTION_TYPES.ROMAJI_TO_KANA ? correctKana.romaji : correctKana.character,
+      question: (() => {
+        switch (questionType) {
+          case QUESTION_TYPES.ROMAJI_TO_KANA:
+            return correctKana.romaji;
+          case QUESTION_TYPES.KANA_TO_ROMAJI:
+          case QUESTION_TYPES.KANA_TO_SOUND:
+            return correctKana.character;
+          case QUESTION_TYPES.SOUND_TO_KANA:
+            return correctKana.character; // This will be replaced with actual sound playback
+          default:
+            return correctKana.romaji;
+        }
+      })(),
       options: allOptions,
       correctAnswer: correctKana,
       priority: correctKana.points < 50 ? 'low' : 

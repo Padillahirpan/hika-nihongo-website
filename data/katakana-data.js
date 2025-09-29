@@ -102,63 +102,63 @@ export const katakanaDakuon = [
     { character: "ベ", romaji: "be", row: "ba", points: 0, unlocked: false, category: 3 },
     { character: "ボ", romaji: "bo", row: "ba", points: 0, unlocked: false, category: 3 },
 
-    { character: "パ", romaji: "pa", row: "pa", points: 0, unlocked: false, category: 4 },
-    { character: "ピ", romaji: "pi", row: "pa", points: 0, unlocked: false, category: 4 },
-    { character: "プ", romaji: "pu", row: "pa", points: 0, unlocked: false, category: 4 },
-    { character: "ペ", romaji: "pe", row: "pa", points: 0, unlocked: false, category: 4 },
-    { character: "ポ", romaji: "po", row: "pa", points: 0, unlocked: false, category: 4 },
+    { character: "パ", romaji: "pa", row: "pa", points: 0, unlocked: false, category: 3 },
+    { character: "ピ", romaji: "pi", row: "pa", points: 0, unlocked: false, category: 3 },
+    { character: "プ", romaji: "pu", row: "pa", points: 0, unlocked: false, category: 3 },
+    { character: "ペ", romaji: "pe", row: "pa", points: 0, unlocked: false, category: 3 },
+    { character: "ポ", romaji: "po", row: "pa", points: 0, unlocked: false, category: 3 },
 ]
 
 export const katakanaYouon = [
-    { character: "キャ", romaji: "kya", row: "kya", points: 0, unlocked: false, category: 5 },
-    { character: "キュ", romaji: "kyu", row: "kya", points: 0, unlocked: false, category: 5 },
-    { character: "キョ", romaji: "kyo", row: "kya", points: 0, unlocked: false, category: 5 },
+    { character: "キャ", romaji: "kya", row: "kya", points: 0, unlocked: false, category: 4 },
+    { character: "キュ", romaji: "kyu", row: "kya", points: 0, unlocked: false, category: 4 },
+    { character: "キョ", romaji: "kyo", row: "kya", points: 0, unlocked: false, category: 4 },
 
-    { character: "シャ", romaji: "sha", row: "sha", points: 0, unlocked: false, category: 5 },
-    { character: "シュ", romaji: "shu", row: "sha", points: 0, unlocked: false, category: 5 },
-    { character: "ショ", romaji: "sho", row: "sha", points: 0, unlocked: false, category: 5 },
+    { character: "シャ", romaji: "sha", row: "sha", points: 0, unlocked: false, category: 4 },
+    { character: "シュ", romaji: "shu", row: "sha", points: 0, unlocked: false, category: 4 },
+    { character: "ショ", romaji: "sho", row: "sha", points: 0, unlocked: false, category: 4 },
 
-    { character: "チャ", romaji: "cha", row: "cha", points: 0, unlocked: false, category: 5 },
-    { character: "チュ", romaji: "chu", row: "cha", points: 0, unlocked: false, category: 5 },
-    { character: "チョ", romaji: "cho", row: "cha", points: 0, unlocked: false, category: 5 },
+    { character: "チャ", romaji: "cha", row: "cha", points: 0, unlocked: false, category: 4 },
+    { character: "チュ", romaji: "chu", row: "cha", points: 0, unlocked: false, category: 4 },
+    { character: "チョ", romaji: "cho", row: "cha", points: 0, unlocked: false, category: 4 },
 
-    { character: "ニャ", romaji: "nya", row: "nya", points: 0, unlocked: false, category: 5 },
-    { character: "ニュ", romaji: "nyu", row: "nya", points: 0, unlocked: false, category: 5 },
-    { character: "ニョ", romaji: "nyo", row: "nya", points: 0, unlocked: false, category: 5 },
+    { character: "ニャ", romaji: "nya", row: "nya", points: 0, unlocked: false, category: 4 },
+    { character: "ニュ", romaji: "nyu", row: "nya", points: 0, unlocked: false, category: 4 },
+    { character: "ニョ", romaji: "nyo", row: "nya", points: 0, unlocked: false, category: 4 },
 
-    { character: "ヒャ", romaji: "hya", row: "hya", points: 0, unlocked: false, category: 5 },
-    { character: "ヒュ", romaji: "hyu", row: "hya", points: 0, unlocked: false, category: 5 },
-    { character: "ヒョ", romaji: "hyo", row: "hya", points: 0, unlocked: false, category: 5 },
+    { character: "ヒャ", romaji: "hya", row: "hya", points: 0, unlocked: false, category: 4 },
+    { character: "ヒュ", romaji: "hyu", row: "hya", points: 0, unlocked: false, category: 4 },
+    { character: "ヒョ", romaji: "hyo", row: "hya", points: 0, unlocked: false, category: 4 },
 
-    { character: "ミャ", romaji: "mya", row: "mya", points: 0, unlocked: false, category: 5 },
-    { character: "ミュ", romaji: "myu", row: "mya", points: 0, unlocked: false, category: 5 },
-    { character: "ミョ", romaji: "myo", row: "mya", points: 0, unlocked: false, category: 5 },
+    { character: "ミャ", romaji: "mya", row: "mya", points: 0, unlocked: false, category: 4 },
+    { character: "ミュ", romaji: "myu", row: "mya", points: 0, unlocked: false, category: 4 },
+    { character: "ミョ", romaji: "myo", row: "mya", points: 0, unlocked: false, category: 4 },
 
-    { character: "リャ", romaji: "rya", row: "rya", points: 0, unlocked: false, category: 5 },
-    { character: "リュ", romaji: "ryu", row: "rya", points: 0, unlocked: false, category: 5 },
-    { character: "リョ", romaji: "ryo", row: "rya", points: 0, unlocked: false, category: 5 },
+    { character: "リャ", romaji: "rya", row: "rya", points: 0, unlocked: false, category: 4 },
+    { character: "リュ", romaji: "ryu", row: "rya", points: 0, unlocked: false, category: 4 },
+    { character: "リョ", romaji: "ryo", row: "rya", points: 0, unlocked: false, category: 4 },
 
-    { character: "ギャ", romaji: "gya", row: "gya", points: 0, unlocked: false, category: 5 },
-    { character: "ギュ", romaji: "gyu", row: "gya", points: 0, unlocked: false, category: 5 },
-    { character: "ギョ", romaji: "gyo", row: "gya", points: 0, unlocked: false, category: 5 },
+    { character: "ギャ", romaji: "gya", row: "gya", points: 0, unlocked: false, category: 4 },
+    { character: "ギュ", romaji: "gyu", row: "gya", points: 0, unlocked: false, category: 4 },
+    { character: "ギョ", romaji: "gyo", row: "gya", points: 0, unlocked: false, category: 4 },
 
-    { character: "ジャ", romaji: "ja", row: "ja", points: 0, unlocked: false, category: 5 },
-    { character: "ジュ", romaji: "ju", row: "ja", points: 0, unlocked: false, category: 5 },
-    { character: "ジョ", romaji: "jo", row: "ja", points: 0, unlocked: false, category: 5 },
+    { character: "ジャ", romaji: "ja", row: "ja", points: 0, unlocked: false, category: 4 },
+    { character: "ジュ", romaji: "ju", row: "ja", points: 0, unlocked: false, category: 4 },
+    { character: "ジョ", romaji: "jo", row: "ja", points: 0, unlocked: false, category: 4 },
 
-    { character: "ビャ", romaji: "bya", row: "bya", points: 0, unlocked: false, category: 5 },
-    { character: "ビュ", romaji: "byu", row: "bya", points: 0, unlocked: false, category: 5 },
-    { character: "ビョ", romaji: "byo", row: "bya", points: 0, unlocked: false, category: 5 },
+    { character: "ビャ", romaji: "bya", row: "bya", points: 0, unlocked: false, category: 4 },
+    { character: "ビュ", romaji: "byu", row: "bya", points: 0, unlocked: false, category: 4 },
+    { character: "ビョ", romaji: "byo", row: "bya", points: 0, unlocked: false, category: 4 },
 
-    { character: "ピャ", romaji: "pya", row: "pya", points: 0, unlocked: false, category: 5 },
-    { character: "ピュ", romaji: "pyu", row: "pya", points: 0, unlocked: false, category: 5 },
-    { character: "ピョ", romaji: "pyo", row: "pya", points: 0, unlocked: false, category: 5 },
+    { character: "ピャ", romaji: "pya", row: "pya", points: 0, unlocked: false, category: 4 },
+    { character: "ピュ", romaji: "pyu", row: "pya", points: 0, unlocked: false, category: 4 },
+    { character: "ピョ", romaji: "pyo", row: "pya", points: 0, unlocked: false, category: 4 },
 ]
 
 export const getAllKatakana = () => {
   const kanas = [
     ...katakanaDataNew,
-    // ...katakanaSokuon, 
+    ...katakanaSokuon, 
     ...katakanaDakuon, 
     ...katakanaYouon];
   return kanas;

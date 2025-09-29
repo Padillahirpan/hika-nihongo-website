@@ -12,10 +12,13 @@ import { generatePrioritizedQuestions } from "../../util/question-generator";
 import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
 import { HIRAGANA_DATA_PROGRESS, DRILLING_RESULT } from "../../hooks/cons-storage";
 import { testType } from "../../data/kana-data";
+import { useLanguage } from '../../contexts/language-context';
+
 
 export default function HiraganaDrilling() {
   const router = useRouter();
   const { supported, speak } = useSpeechSynthesis("ja-JP");
+  const { t } = useLanguage();
 
   const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, getAllHiragana());  
 
@@ -80,7 +83,12 @@ export default function HiraganaDrilling() {
 
   const handleAnswerSelect = (selectedOption) => {
     setSelectedAnswer(selectedOption);
-    pronounceHiragana(selectedOption.character);
+
+    const question = questions[currentQuestion];
+
+    if(question.type === "soundToKana" || question.type === "kanaToSound") {
+      pronounceHiragana(selectedOption.character);
+    }
   };
 
   const updateMasteryLevel = (kana, isCorrect) => {
@@ -110,7 +118,13 @@ export default function HiraganaDrilling() {
       setSelectedAnswer(null);
       setShowResult(false);
 
-      pronounceHiragana(questions[currentQuestion + 1].correctAnswer.character);
+      const nextQuestion = questions[currentQuestion + 1];
+      const questionsType = questions[currentQuestion].type
+      
+      // Pronounce the next question's correct answer
+      if (questionsType === "soundToKana" || questionsType === "kanaToSound") {
+        pronounceHiragana(nextQuestion.correctAnswer.character);
+      }
 
     } else {
       setIsFinished(true);
@@ -149,7 +163,7 @@ export default function HiraganaDrilling() {
   };
 
   const handleBackToHome = () => {
-    router.push('/');
+    router.back();
   };
 
   const handleRestartDrilling = () => {
@@ -174,23 +188,26 @@ export default function HiraganaDrilling() {
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-lg w-full">
           <h2 className="text-3xl font-bold mb-4 text-sky-600">
-            Drilling Complete!
+            {t('drilling.complete.title')}
+            {t('instructions.flip')}
           </h2>
-          <p className="text-xl mb-2">Your Score: {score}/10</p>
+          <p className="text-xl mb-2">
+            {t('drilling.complete.yourscore')} {score}/10
+          </p>
           <p className="text-lg mb-6 text-gray-600">
             {Math.round((score / 10) * 100)}% -{" "}
             {score >= 8
-              ? "Excellent work!"
+              ? t('drilling.complete.level-1')
               : score >= 6
-                ? "Good job!"
-                : "Keep practicing!"}
+                ? t('drilling.complete.level-2')
+                : t('drilling.complete.level-3')}
           </p>
 
           {/* Previous Results */}
           {previousResults.length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                Recent Scores
+                {t('drilling.complete.recentscores')}
               </h3>
               <div className="space-y-2">
                 {previousResults.map((result, index) => (
@@ -255,22 +272,53 @@ export default function HiraganaDrilling() {
         {/* Question Card */}
         <div className="min-h-full items-center justify-center">
           <div className="text-xl sm:text-2xl my-4 text-gray-900 font-jakarta">
-            Select the correct one?
+            {(() => {
+              switch (currentQ.type) {
+                case 'romajiToKana':
+                  return "Select the correct kana for this romaji:";
+                case 'kanaToRomaji':
+                  return "Select the correct romaji for this kana:";
+                case 'soundToKana':
+                  return "Listen to the sound and select the correct kana:";
+                case 'kanaToSound':
+                  return "Select the correct pronunciation for this kana:";
+                default:
+                  return "Select the correct one:";
+              }
+            })()}
           </div>
           <div className="w-full h-full items-center justify-center rounded-lg shadow-sm p-2">
             <div className="w-full h-lg flex items-center justify-center text-xl text-center p-4 mb-4 font-bold text-sky-900">
               <button
-                  // onClick={pronounceHiragana(currentQ.question)}
-                  className="group flex w-fit h-[100px] sm:w-[100px] sm:h-[100px] justify-center items-center 
+                  onClick={() => {
+                    if (currentQ.type === 'soundToKana') {
+                      pronounceHiragana(currentQ.correctAnswer.character);
+                    } else if (currentQ.type === 'kanaToSound') {
+                      pronounceHiragana(currentQ.question);
+                    }
+                  }}
+                  className={`group flex w-fit h-[100px] sm:w-[100px] sm:h-[100px] justify-center items-center 
                     gap-6 px-12 py-4 bg-rose-500 text-white font-mono font-semibold text-2xl relative overflow-hidden 
                     rounded-xl border-4 border-black hover:border-rose-500 shadow-[4px_8px_0px_#000] 
-                    hover:shadow-[0px_0px_0px_#000] transition-all duration-200 uppercase"
+                    hover:shadow-[0px_0px_0px_#000] transition-all duration-200 uppercase
+                    ${(currentQ.type === "soundToKana" || currentQ.type === "kanaToSound") ? "cursor-pointer hover:scale-105" : ""}`}
                   aria-label="Pronounce"
                 >
-                <div className="relative transition-all duration-200">
-                  <span className="inline-block transition-all duration-200 font-noto-jp">{ currentQ.question }</span>
-                </div>
-              </button>
+                  <div className="relative transition-all duration-200">
+                    {currentQ.type === 'soundToKana' ? (
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                        </svg>
+                        {/* <span className="text-sm">Click to Play</span> */}
+                      </div>
+                    ) : (
+                      <span className="inline-block transition-all duration-200 font-noto-jp">
+                        {currentQ.question}
+                      </span>
+                    )}
+                  </div>
+                </button>
             </div>
 
             {/* Answer Options */}

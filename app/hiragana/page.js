@@ -6,17 +6,13 @@ import { getAllHiragana } from "../../data/kana-data";
 import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
 import { KanaSection } from "../../components/kana-section";
-import { useEffect } from "react";
+import { useLanguage } from '../../contexts/language-context';
 
 export default function HiraganaPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [dataKana, setDataKana] = getLocalHiraganaData(HIRAGANA_DATA_PROGRESS, getAllHiragana());
-    
-  useEffect(() => {
-    const allKana = getAllHiragana();
-    console.log('this is all kana: ', allKana.length);
-  }, [])
 
   const handleBackToHome = () => {
     router.back();
@@ -37,10 +33,14 @@ export default function HiraganaPage() {
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta">
           Hiragana
         </h1>
-        <p className="text-l font-regular text-gray-500 text-left mb-8 font-jakarta">
-          Click on a card to flip it and see the romaji. Click the sound icon to
-          hear pronunciation.
-        </p>
+        <div className="w-full bg-rose-300 p-4 rounded-lg mb-4 flex flex-col justify-center" >
+          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+          {t('instructions.flip')}
+          </p>
+          <p className="text-l font-regular text-gray-500 text-left font-jakarta text-white">
+            {t('instructions.sound')}
+          </p>
+        </div>
 
         <KanaSection
           title="Hiragana"

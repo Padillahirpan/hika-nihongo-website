@@ -51,17 +51,18 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
     
     if (masteryLevel === 0) return "bg-white";
     if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100";
-    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-200";
-    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-300";
-    if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-400";
+    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-300";
+    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-500";
+    if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-700";
     return "bg-rose-600"; // masteryLevel >= 80
   };
 
   // Determine text color based on mastery level
   const getTextColor = () => {
     // During SSR, return a safe default to prevent hydration mismatch
-    if (!isMounted) return "text-rose-800";
+    if (!isMounted) return "text-black";
     
+    if (masteryLevel === 0) return "text-black";
     if (masteryLevel < 20) return "text-rose-800";
     if (masteryLevel < 40) return "text-rose-600";
     return "text-white"; // masteryLevel >= 40
@@ -69,11 +70,11 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
 
   if (!unlocked) {
     return (
-      <div className="flex w-full h-[100px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
+      <div className="flex w-full h-[80px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
         <div
           className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200"
         >
-          <span className="text-lg sm:text-8xl font-bold text-gray-400 font-noto-jp">
+          <span className="text-xs sm:text-6xl font-bold text-gray-400 font-noto-jp">
             {kana}
           </span>
         </div>
@@ -83,7 +84,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
 
   return (
     <div
-      className="flex w-full h-[100px] md:w-full md:h-[190px] lg:w-full cursor-pointer"
+      className="flex w-full h-[80px] md:w-full md:h-[190px] lg:w-full cursor-pointer"
       onClick={handleCardFlip}
     >
       <div
