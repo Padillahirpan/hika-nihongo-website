@@ -4,12 +4,21 @@ import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
 import { useTheme } from '../../contexts/theme-context';
 import { useLanguage } from '../../contexts/language-context';
+import Modal from '../../components/Modal';
+import { useState } from 'react';
 
 export default function SettingsPage() {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage, t } = useLanguage();
+
+  const resetData = () => {
+    localStorage.removeItem('hiraganaDataProgress');
+    localStorage.removeItem('katakanaDataProgress');
+    router.refresh();
+  };
 
   const handleBackToHome = () => {
     router.back();
@@ -111,6 +120,34 @@ export default function SettingsPage() {
                 ID
               </button>
             </div>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                {t('settings.resetdata')}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                {t('settings.resetdata.description')}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label={t('settings.resetdata.toggle')}
+            >
+              {t('settings.button.reset')}
+            </button>
+
+            <Modal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onConfirm={() => {
+                resetData();
+                setIsModalOpen(false);
+              }}
+              title={t('settings.resetdata')}
+              message={t('settings.resetdata.confirm')}
+            />
           </div>
         </div>
       </div>
