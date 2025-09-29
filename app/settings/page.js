@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-japan-white-off dark:bg-gray-900 transition-colors">
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-8">
         
         {/* Back Button */}
         <BackButton 
@@ -132,7 +132,7 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-800 dark:text-gray-100"
               aria-label={t('settings.resetdata.toggle')}
             >
               {t('settings.button.reset')}

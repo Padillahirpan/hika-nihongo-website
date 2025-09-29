@@ -90,7 +90,7 @@ export default function KatakanaDrilling() {
       let points = item.points;
 
       if (isCorrect) {
-        points = Math.min(100, item.points + 30);
+        points = Math.min(100, item.points + 20);
       } else {
         points = Math.max(0, item.points - 5);
       }

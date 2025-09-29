@@ -31,7 +31,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-grey-50 dark:bg-gray-900">
       <BubbleGradient/>
 
       <div className="relative flex flex-col items-center justify-center min-w-sm min-h-screen p-2 md:p-4">
@@ -48,7 +48,7 @@ export default function HomePage() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-8 h-8"
+              className="w-8 h-8 text-gray-800 dark:text-gray-100"
             >
               <path
                 strokeLinecap="round"
@@ -64,14 +64,14 @@ export default function HomePage() {
           </Link>
         </div>
         <div className='relative items-center justify-center text-center'>
-          <h1 className="text-6xl font-bold text-gray-800 mb-6 text-center font-noto-jp">HikaGo Nihongo N5</h1>
+          <h1 className="text-6xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center font-noto-jp">HikaGo Nihongo N5</h1>
           <div className="typewriter-container text-xl min-h-[4.5rem] text-center flex flex-col items-center justify-center">
             {showText && (
               <>
-                <div className="typewriter text-xl text-gray-800 font-jakarta mb-2">
+                <div className="typewriter text-xl text-gray-800 dark:text-gray-100 font-jakarta mb-2">
                   {welcomeText[currentTextIndex].japanese}
                 </div>
-                <div className="text-gray-600 mt-1 font-jakarta">
+                <div className="text-gray-600 dark:text-gray-400 mt-1 font-jakarta">
                   {language === 'id' ? welcomeText[currentTextIndex].id : welcomeText[currentTextIndex].english}
                 </div>
               </>

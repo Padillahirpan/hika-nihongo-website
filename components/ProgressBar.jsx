@@ -1,7 +1,7 @@
 const ProgressBar = ({ current, total, baseColor, progressColor, size = 1 }) => {
   const progress = (current / total) * 100;
-  const baseColorClass = baseColor || "bg-rose-100";
-  const progressColorClass = progressColor || "bg-gradient-to-r bg-rose-400 to-rose-500";
+  const baseColorClass = baseColor || "bg-rose-100 dark:bg-rose-900";
+  const progressColorClass = progressColor || "bg-gradient-to-r from-rose-400 to-rose-500 dark:from-rose-500 dark:to-rose-400";
   const sizeClass = size === 1 ? "h-5 lg:h-8" : "h-3 lg:h-4";
 
   return (

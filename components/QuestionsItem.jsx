@@ -7,21 +7,21 @@ const QuestionsItem = ({ currentQ, showResult, selectedAnswer, handleAnswerSelec
 
         if (showResult) {
           if (option.romaji === currentQ.correctAnswer.romaji) {
-            buttonClass += " bg-green-500 text-white border-green-500";
+            buttonClass += " bg-green-500 dark:bg-green-600 text-white border-green-500 dark:border-green-600";
           } else if (option.romaji === selectedAnswer.romaji) {
-            buttonClass += " bg-rose-500 text-white border-rose-600";
+            buttonClass += " bg-rose-500 dark:bg-rose-600 text-white border-rose-600";
           } else {
-            buttonClass += " bg-gray-200 text-gray-500 border-gray-300";
+            buttonClass += " bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600";
           }
         } else {
           if(selectedAnswer != null) {
             if(option.romaji === selectedAnswer.romaji) {
-              buttonClass += " bg-sky-100 border-sky-400 hover:border-blue-400 cursor-pointer text-blue-400";
+              buttonClass += " bg-sky-100 dark:bg-sky-900 border-sky-400 dark:border-sky-600 hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer text-blue-400 dark:text-blue-300";
             } else {
-              buttonClass += " bg-yellow hover:bg-gray-50 border-gray-300 hover:border-blue-500 cursor-pointer";
+              buttonClass += " bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-blue-500 cursor-pointer text-gray-800 dark:text-gray-200";
             }
           } else {
-            buttonClass += " bg-yellow hover:bg-blue-50 border-gray-300 hover:border-blue-500 cursor-pointer";
+            buttonClass += " bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-blue-500 cursor-pointer text-gray-800 dark:text-gray-200";
           }
         }
 

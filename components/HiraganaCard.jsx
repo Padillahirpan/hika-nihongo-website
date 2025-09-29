@@ -47,24 +47,24 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
   // Determine background color based on mastery level
   const getBackgroundColor = () => {
     // During SSR, return a safe default to prevent hydration mismatch
-    if (!isMounted) return "bg-white";
+    if (!isMounted) return "bg-white dark:bg-gray-800";
     
-    if (masteryLevel === 0) return "bg-white";
-    if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100";
-    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-300";
-    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-500";
-    if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-700";
-    return "bg-rose-600"; // masteryLevel >= 80
+    if (masteryLevel === 0) return "bg-white dark:bg-gray-800";
+    if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100 dark:bg-rose-900";
+    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-300 dark:bg-rose-700";
+    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-500 dark:bg-rose-600";
+    if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-700 dark:bg-rose-500";
+    return "bg-rose-600 dark:bg-rose-400"; // masteryLevel >= 80
   };
 
   // Determine text color based on mastery level
   const getTextColor = () => {
     // During SSR, return a safe default to prevent hydration mismatch
-    if (!isMounted) return "text-black";
+    if (!isMounted) return "text-black dark:text-white";
     
-    if (masteryLevel === 0) return "text-black";
-    if (masteryLevel < 20) return "text-rose-800";
-    if (masteryLevel < 40) return "text-rose-600";
+    if (masteryLevel === 0) return "text-black dark:text-white";
+    if (masteryLevel < 20) return "text-rose-800 dark:text-rose-200";
+    if (masteryLevel < 40) return "text-rose-600 dark:text-rose-300";
     return "text-white"; // masteryLevel >= 40
   };
 
@@ -72,9 +72,9 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
     return (
       <div className="flex w-full h-[80px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
         <div
-          className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200"
+          className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200 dark:bg-gray-700"
         >
-          <span className="text-xs sm:text-6xl font-bold text-gray-400 font-noto-jp">
+          <span className="text-xs sm:text-6xl font-bold text-gray-400 dark:text-gray-500 font-noto-jp">
             {kana}
           </span>
         </div>
@@ -98,7 +98,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
         <div
           className={`flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden]`}
         >
-          <span className={`text-lg sm:text-8xl font-bold ${getTextColor()} font-noto-jp`}>
+          <span className={`text-xs sm:text-6xl font-bold ${getTextColor()} font-noto-jp`}>
             {kana}
           </span>
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">

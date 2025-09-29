@@ -98,7 +98,7 @@ export default function HiraganaDrilling() {
       let points = item.points;
 
       if (isCorrect) {
-        points = Math.min(100, item.points + 30);
+        points = Math.min(100, item.points + 20);
       } else {
         points = Math.max(0, item.points - 5);
       }
@@ -177,24 +177,23 @@ export default function HiraganaDrilling() {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-xl">Loading questions...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="text-xl text-gray-800 dark:text-gray-200">Loading questions...</div>
       </div>
     );
   }
 
   if (isFinished) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-lg w-full">
-          <h2 className="text-3xl font-bold mb-4 text-sky-600">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-lg w-full">
+          <h2 className="text-3xl font-bold mb-4 text-sky-600 dark:text-sky-400">
             {t('drilling.complete.title')}
-            {t('instructions.flip')}
           </h2>
-          <p className="text-xl mb-2">
+          <p className="text-xl mb-2 text-gray-800 dark:text-gray-200">
             {t('drilling.complete.yourscore')} {score}/10
           </p>
-          <p className="text-lg mb-6 text-gray-600">
+          <p className="text-lg mb-6 text-gray-600 dark:text-gray-400">
             {Math.round((score / 10) * 100)}% -{" "}
             {score >= 8
               ? t('drilling.complete.level-1')
@@ -206,7 +205,7 @@ export default function HiraganaDrilling() {
           {/* Previous Results */}
           {previousResults.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3 text-gray-700">
+              <h3 className="text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300">
                 {t('drilling.complete.recentscores')}
               </h3>
               <div className="space-y-2">
