@@ -144,6 +144,14 @@ export default function HomePage() {
               <div className='text-xl font-bold'>Kanji</div>
             </div>
           </Link>
+          <Link
+            href="/kana-animated"
+            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
+          >
+            <div className='flex flex-col'>
+              <div className='text-xl font-bold'>Writting</div>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
