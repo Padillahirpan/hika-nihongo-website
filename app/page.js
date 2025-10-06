@@ -84,7 +84,7 @@ export default function HomePage() {
           alt="App Logo"
           width={500}
           height={500}
-          priority // Use for above-the-fold images
+          priority
         />
       </div>
 
@@ -134,6 +134,14 @@ export default function HomePage() {
                 )
                 }
               </div>
+            </div>
+          </Link>
+          <Link
+            href="/kanji"
+            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
+          >
+            <div className='flex flex-col'>
+              <div className='text-xl font-bold'>Kanji</div>
             </div>
           </Link>
         </div>

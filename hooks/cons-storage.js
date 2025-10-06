@@ -5,3 +5,5 @@ export const DRILLING_RESULT = 'drillingResults';
 export const KATAKANA_DATA_PROGRESS = 'katakanaDataProgress';
 export const KATAKANA_DAKUON_DATA_PROGRESS = 'katakanaDakuonDataProgress';
 export const KATAKANA_YOUON_DATA_PROGRESS = 'katakanaYouonDataProgress';
+
+export const KANJI_DATA_PROGRESS = 'kanjiDataProgress';
