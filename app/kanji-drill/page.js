@@ -37,10 +37,6 @@ const getQuestionText = (type, item) => {
       return item.romaji;
     case "meaningToKanji":
       return item.english;
-    case "kanjiToSound":
-      return item.kanji;
-    case "soundToKanji":
-      return item.kanji;
     default:
       return item.kanji;
   }
@@ -134,15 +130,31 @@ const KanjiOptions = ({ currentQ, showResult, selectedAnswer, handleAnswerSelect
               {(() => {
                 switch (currentQ.type) {
                   case 'kanjiToKana':
-                    return option.character;
+                    return (
+                      <div className="font-noto-jp">
+                        { option.character }
+                      </div>
+                    );
                   case 'kanjiToMeaning':
-                    return option.romaji;
+                    return (
+                      <div className="font-noto-jp">
+                        { option.romaji }
+                      </div>
+                    );
                   case 'meaningToKanji':
-                    return option.character;
+                    return (
+                      <div className="font-noto-jp">
+                        { option.character }
+                      </div>
+                    );
                   case 'romajiToKanji':
-                    return option.kanji;
-                  case 'romajiToSound':
-                  case 'soundToRomaji':
+                  case 'soundToKanji':
+                    return (
+                      <div className="font-noto-jp">
+                        { option.kanji }
+                      </div>
+                    );
+                  case 'kanjiToSound':
                     return (
                       <div className="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -224,12 +236,7 @@ export default function KanjiDrilling() {
       return;
     }
 
-    const newQuestions = generateQuestions();
     loadPreviousResults();
-
-    if (newQuestions.length > 0) {
-      pronounceKanji(newQuestions[0].correctAnswer.character);
-    }
 
     setInitialized(true);
   }, [initialized, storedData]);
@@ -251,8 +258,8 @@ export default function KanjiDrilling() {
 
   const handleAnswerSelect = (selectedOption) => {
     setSelectedAnswer(selectedOption);
-    if (currentQ.type === "romajiToSound" || currentQ.type === "soundToRomaji") {
-      pronounceKanji(selectedOption.romaji);
+    if (currentQ.type === "kanjiToSound" || currentQ.type === "soundToKanji") {
+      pronounceKanji(selectedOption.kanji);
     }
   };
 
@@ -277,12 +284,6 @@ export default function KanjiDrilling() {
       setSelectedAnswer(null);
       setShowResult(false);
 
-      console.log(`this is the question type: ${JSON.stringify(questions[nextIndex])}`);
-
-
-      if (questions[nextIndex].type === "romajiToSound" || questions[nextIndex].type === "soundToRomaji") {
-        pronounceKanji(questions[nextIndex].correctAnswer.romaji);
-      }
     } else {
       setIsFinished(true);
       saveDrillingResult();
@@ -325,9 +326,9 @@ export default function KanjiDrilling() {
     setShowResult(false);
     setIsFinished(false);
     const newQuestions = generateQuestions();
-    if (newQuestions.length > 0) {
-      pronounceKanji(newQuestions[0].correctAnswer.character);
-    }
+    // if (newQuestions.length > 0) {
+    //   pronounceKanji(newQuestions[0].correctAnswer.kanji);
+    // }
   };
 
   if (questions.length === 0) {
@@ -427,26 +428,23 @@ export default function KanjiDrilling() {
           <div className="w-full h-lg flex items-center justify-center text-xl text-center p-4 mb-4 font-bold text-sky-900">
               <button
                   onClick={() => {
-                    if (currentQ.type === 'soundToKana') {
-                      pronounceHiragana(currentQ.correctAnswer.character);
-                    } else if (currentQ.type === 'kanaToSound') {
-                      pronounceHiragana(currentQ.question);
+                    if (currentQ.type === 'soundToKanji') {
+                      pronounceKanji(currentQ.correctAnswer.kanji);
                     }
                   }}
                   className={`group flex w-fit h-[100px] sm:w-[100px] sm:h-[100px] justify-center items-center 
                     gap-6 px-12 py-4 bg-rose-500 text-white font-mono font-semibold text-2xl relative overflow-hidden 
                     rounded-xl border-4 border-black hover:border-rose-500 shadow-[4px_8px_0px_#000] 
                     hover:shadow-[0px_0px_0px_#000] transition-all duration-200 uppercase
-                    ${(currentQ.type === "soundToKana" || currentQ.type === "kanaToSound") ? "cursor-pointer hover:scale-105" : ""}`}
+                    ${(currentQ.type === "soundToKanji" || currentQ.type === "kanjiToSound") ? "cursor-pointer hover:scale-105" : ""}`}
                   aria-label="Pronounce"
                 >
                   <div className="relative transition-all duration-200">
-                    {currentQ.type === 'soundToKana' ? (
+                    {currentQ.type === 'soundToKanji' ? (
                       <div className="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
                         </svg>
-                        {/* <span className="text-sm">Click to Play</span> */}
                       </div>
                     ) : (
                       <span className="inline-block transition-all duration-200 font-noto-jp">
