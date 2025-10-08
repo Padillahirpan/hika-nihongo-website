@@ -6,15 +6,18 @@ import BackButton from "../../components/BackButton";
 import KanaStrokePlayer from "../../components/KanaStrokePlayer";
 import { KANA_GLYPHS, groupOrder } from "../../data/kana-strokes";
 import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
+import { useLanguage } from "../../contexts/language-context";
 
-const scripts = [
-  { key: "hiragana", label: "Hiragana" },
-  { key: "katakana", label: "Katakana" }
-];
+// script labels will be localized inside the component via useLanguage
 
 export default function KanaAnimatePage() {
   const router = useRouter();
   const { supported, speak } = useSpeechSynthesis("ja-JP");
+  const { t } = useLanguage();
+  const scripts = useMemo(() => ([
+    { key: "hiragana", label: t('kanaAnimated.scripts.hiragana') },
+    { key: "katakana", label: t('kanaAnimated.scripts.katakana') }
+  ]), [t]);
   const [script, setScript] = useState("hiragana");
   const [query, setQuery] = useState("");
   const glyphs = useMemo(
@@ -51,12 +54,12 @@ export default function KanaAnimatePage() {
         <BackButton handleBackToHome={handleBackToHome} />
         <header className="mt-6 mb-8 text-left sm:text-left">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 sm:text-4xl md:text-5xl font-jakarta">
-            Kana Stroke Animations
+            {t('kanaAnimated.title')}
           </h1>
           <p className="mt-4 max-w-3xl text-left text-sm text-gray-600 dark:text-gray-300 sm:text-base md:text-lg">
-            Choose any hiragana or katakana character to watch its stroke order courtesy of
-            <span className="font-semibold"> KanjiVG</span>. Filter by romaji, tap a kana, and use the
-            speaker button to practise pronunciation.
+            {t('kanaAnimated.desc1.prefix')}
+            <span className="font-semibold"> KanjiVG</span>
+            {t('kanaAnimated.desc1.suffix')} {t('kanaAnimated.desc2')}
           </p>
         </header>
 
@@ -83,7 +86,7 @@ export default function KanaAnimatePage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search kana or romaji"
+              placeholder={t('kanaAnimated.searchPlaceholder')}
               className="w-full rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-sm outline-none transition focus:ring-2 focus:ring-rose-400 dark:border-rose-900/40 dark:bg-gray-900/60 dark:text-gray-200"
             />
           </div>
@@ -111,7 +114,7 @@ export default function KanaAnimatePage() {
                   <path d="M19.07 4.93a10 10 0 010 14.14" />
                   <path d="M15.54 8.46a5 5 0 010 7.07" />
                 </svg>
-                Play Sound
+                {t('kanaAnimated.playSound')}
               </button>
             </div>
           </div>

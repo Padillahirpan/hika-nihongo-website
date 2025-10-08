@@ -48,6 +48,16 @@ export const translations = {
     "drilling.complete.level-2": "Good job!",
     "drilling.complete.level-3": "Keep practicing!",
     "drilling.complete.recentscores": "Recent Scores",
+    
+    // Kana Animated
+    "kanaAnimated.title": "Kana Stroke Animations",
+    "kanaAnimated.desc1.prefix": "Choose any hiragana or katakana character to watch its stroke order courtesy of",
+    "kanaAnimated.desc1.suffix": ".",
+    "kanaAnimated.desc2": "Filter by romaji, tap a kana, and use the speaker button to practise pronunciation.",
+    "kanaAnimated.searchPlaceholder": "Search kana or romaji",
+    "kanaAnimated.playSound": "Play Sound",
+    "kanaAnimated.scripts.hiragana": "Hiragana",
+    "kanaAnimated.scripts.katakana": "Katakana",
   },
   id: {
     // Navigation
@@ -98,5 +108,15 @@ export const translations = {
     "drilling.complete.level-2": "Pekerjaan bagus!",
     "drilling.complete.level-3": "Lanjutkan latihan!",
     "drilling.complete.recentscores": "Nilai Terakhir",
+    
+    // Kana Animated
+    "kanaAnimated.title": "Animasi Urutan Guratan Kana",
+    "kanaAnimated.desc1.prefix": "Pilih karakter hiragana atau katakana untuk melihat urutan guratannya dari",
+    "kanaAnimated.desc1.suffix": ".",
+    "kanaAnimated.desc2": "Filter dengan romaji, klik sebuah kana, dan gunakan tombol speaker untuk berlatih pelafalan.",
+    "kanaAnimated.searchPlaceholder": "Cari kana atau romaji",
+    "kanaAnimated.playSound": "Putar Suara",
+    "kanaAnimated.scripts.hiragana": "Hiragana",
+    "kanaAnimated.scripts.katakana": "Katakana",
   },
 };
