@@ -158,7 +158,7 @@ export const katakanaYouon = [
 export const getAllKatakana = () => {
   const kanas = [
     ...katakanaDataNew,
-    ...katakanaSokuon, 
+    // ...katakanaSokuon, 
     ...katakanaDakuon, 
     ...katakanaYouon];
   return kanas;

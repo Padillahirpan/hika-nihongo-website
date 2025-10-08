@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import BubbleGradient from '../components/BubbleGradient';
@@ -10,36 +10,95 @@ import { HIRAGANA_DATA_PROGRESS, KATAKANA_DATA_PROGRESS } from '../hooks/cons-st
 import { getCurrentKanaProgress } from '../hooks/user-local-storage';
 import { useLanguage } from '../contexts/language-context';
 
+const NavigationCard = ({ href, title, progress }) => {
+  const hasProgress = progress && progress.total > 0;
+
+  return (
+    <Link
+      href={href}
+      className="w-full flex-1 max-w-lg rounded-lg bg-gradient-to-r from-rose-200 to-rose-400 px-4 py-2 text-center font-semibold text-white shadow-lg transition-all duration-300 hover:from-rose-400 hover:to-rose-500 hover:shadow-xl"
+    >
+      <div className="flex flex-col">
+        <div className="text-xl font-bold font-jakarta">{title}</div>
+        {hasProgress && (
+          <div className="mt-2 flex flex-row items-center justify-center gap-2">
+            <ProgressBar
+              current={progress.current}
+              total={progress.total}
+              baseColor="bg-gray-200"
+              progressColor="bg-rose-500"
+              size={0}
+            />
+            <div className="text-sm">
+              {progress.current}/{progress.total}
+            </div>
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+};
+
 export default function HomePage() {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showText, setShowText] = useState(true);
   const { language } = useLanguage();
-  
+
   const { masteredKana: hiraganaKana, totalKana: hiraganaTotal } = getCurrentKanaProgress(HIRAGANA_DATA_PROGRESS);
   const { masteredKana: katakanaKana, totalKana: katakanaTotal } = getCurrentKanaProgress(KATAKANA_DATA_PROGRESS);
 
   useEffect(() => {
-    const textInterval = setInterval(() => {
+    let timeoutId;
+    const intervalId = setInterval(() => {
       setShowText(false);
-      setTimeout(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
         setCurrentTextIndex((prevIndex) => (prevIndex + 1) % welcomeText.length);
         setShowText(true);
       }, 2000);
     }, 6000);
 
-    return () => clearInterval(textInterval);
+    return () => {
+      clearInterval(intervalId);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
+
+  const navigationSections = [
+    {
+      href: '/hiragana',
+      title: 'Hiragana',
+      progress: { current: hiraganaKana, total: hiraganaTotal },
+    },
+    {
+      href: '/katakana',
+      title: 'Katakana',
+      progress: { current: katakanaKana, total: katakanaTotal },
+    },
+    {
+      href: '/kanji',
+      title: 'Kanji',
+    },
+    {
+      href: '/kana-animated',
+      title: 'Writing',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-grey-50 dark:bg-gray-900">
-      <BubbleGradient/>
+      <BubbleGradient />
 
-      <div className="relative flex flex-col items-center justify-center min-w-sm min-h-screen p-2 md:p-4">
-        {/* Settings Button */}
-        <div className="w-11/12 max-w-4xl flex justify-end">
+      <div className="relative flex min-h-screen w-full flex-col items-center justify-center p-2 md:p-4">
+        <div className="flex w-11/12 max-w-4xl justify-end">
           <Link
             href="/settings"
-            className="p-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="rounded-lg p-8 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
             title="Settings"
           >
             <svg
@@ -48,7 +107,7 @@ export default function HomePage() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-8 h-8 text-gray-800 dark:text-gray-100"
+              className="h-8 w-8 text-gray-800 dark:text-gray-100"
             >
               <path
                 strokeLinecap="round"
@@ -63,21 +122,21 @@ export default function HomePage() {
             </svg>
           </Link>
         </div>
-        <div className='relative items-center justify-center text-center'>
-          <h1 className="text-6xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center font-noto-jp">HikaGo Nihongo N5</h1>
-          <div className="typewriter-container text-xl min-h-[4.5rem] text-center flex flex-col items-center justify-center">
+        <div className="relative items-center justify-center text-center">
+          <h1 className="mb-6 text-center text-6xl font-bold text-gray-800 dark:text-gray-100 font-noto-jp">HikaGo Nihongo N5</h1>
+          <div className="typewriter-container flex min-h-[4.5rem] flex-col items-center justify-center text-center text-xl">
             {showText && (
               <>
-                <div className="typewriter text-xl text-gray-800 dark:text-gray-100 font-jakarta mb-2">
+                <div className="typewriter mb-2 text-xl text-gray-800 dark:text-gray-100 font-jakarta">
                   {welcomeText[currentTextIndex].japanese}
                 </div>
-                <div className="text-gray-600 dark:text-gray-400 mt-1 font-jakarta">
+                <div className="mt-1 text-gray-600 dark:text-gray-400 font-jakarta">
                   {language === 'id' ? welcomeText[currentTextIndex].id : welcomeText[currentTextIndex].english}
                 </div>
               </>
             )}
           </div>
-        </div> 
+        </div>
         <Image
           className="mb-8"
           src="/images/hikago_ic.png"
@@ -88,70 +147,11 @@ export default function HomePage() {
         />
       </div>
 
-      <div className="fixed bottom-8 sm:bottom-4 xl:bottom-32 left-0 right-0 flex justify-center items-center gap-4 px-4 z-50">
-        <div className="flex flex-col w-11/12 max-w-4xl gap-4 items-center">
-          <Link
-            href="/hiragana"
-            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
-          >
-            <div className='flex flex-col'>
-              <div className='text-xl font-bold font-jakarta'>Hiragana</div>
-              <div className='flex flex-row items-center mt-2 justify-center gap-2'>
-                {hiraganaTotal > 0 && (
-                  <>
-                    <ProgressBar 
-                      current={hiraganaKana}
-                      total={hiraganaTotal}
-                      baseColor={"bg-gray-200"}
-                      progressColor={"bg-rose-500"}
-                      size={0}
-                    />
-                    <div className='text-sm'>{hiraganaKana}/{hiraganaTotal}</div>
-                  </>
-                )
-                }
-              </div>
-            </div>
-          </Link>
-          <Link
-            href="/katakana"
-            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
-          >
-            <div className='flex flex-col'>
-              <div className='text-xl font-bold'>Katakana</div>
-              <div className='flex flex-row items-center mt-2 justify-center gap-2'>
-                {katakanaTotal > 0 && (
-                  <>
-                    <ProgressBar 
-                      current={katakanaKana}
-                      total={katakanaTotal}
-                      baseColor={"bg-gray-200"}
-                      progressColor={"bg-rose-500"}
-                      size={0}
-                    />
-                    <div className='text-sm'>{katakanaKana}/{katakanaTotal}</div>
-                  </>
-                )
-                }
-              </div>
-            </div>
-          </Link>
-          <Link
-            href="/kanji"
-            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
-          >
-            <div className='flex flex-col'>
-              <div className='text-xl font-bold'>Kanji</div>
-            </div>
-          </Link>
-          <Link
-            href="/kana-animated"
-            className="flex-1 w-full max-w-lm bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 rounded-lg px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300 text-center font-semibold text-white"
-          >
-            <div className='flex flex-col'>
-              <div className='text-xl font-bold'>Writting</div>
-            </div>
-          </Link>
+      <div className="fixed left-0 right-0 bottom-8 flex items-center justify-center gap-4 px-4 sm:bottom-4 xl:bottom-32 z-50">
+        <div className="flex w-11/12 max-w-4xl flex-col items-center gap-4">
+          {navigationSections.map(({ href, title, progress }) => (
+            <NavigationCard key={href} href={href} title={title} progress={progress} />
+          ))}
         </div>
       </div>
     </div>

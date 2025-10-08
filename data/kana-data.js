@@ -165,7 +165,7 @@ export const hiraganaYouon = [
 export const getAllHiragana = () => {
   const kanas = [
     ...hiraganaDataNew,
-    ...hiraganaSokuon, 
+    // ...hiraganaSokuon, 
     ...hiraganaDakuon, 
     ...hiraganaYouon];
 

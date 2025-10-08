@@ -1,121 +1,119 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { checkUnlockConditions } from '../util/unlock-logic';
 
+// Shared constants
+const PASS_THRESHOLD = 80;
+
+// Safe JSON helpers for localStorage
+const readJSON = (key) => {
+  try {
+    if (typeof window === 'undefined') return null;
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    console.error('Error reading localStorage for key:', key, err);
+    return null;
+  }
+};
+
+const writeJSON = (key, value) => {
+  try {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (err) {
+    console.error('Error writing localStorage for key:', key, err);
+  }
+};
+
+/**
+ * Hook: useLocalStorage
+ * Mirrors a piece of state to localStorage under `key`.
+ */
 export const useLocalStorage = (key, initialValue) => {
   const [value, setValue] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const storedValue = window.localStorage.getItem(key);
-      return storedValue ? JSON.parse(storedValue) : initialValue;
-    }
-    return initialValue;
+    const parsed = readJSON(key);
+    return parsed ?? initialValue;
   });
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    writeJSON(key, value);
   }, [key, value]);
 
   return [value, setValue];
 };
 
-export const getCurrentKanaProgress = (key) => {
-  const [data, setData] = useState({ masteredKana: 0, totalKana: 0 });
+/**
+ * Hook: useKanaProgress
+ * Computes mastered and total kana counts from localStorage array at `key`.
+ */
+export const useKanaProgress = (key) => {
+  const [progress, setProgress] = useState({ masteredKana: 0, totalKana: 0 });
 
   useEffect(() => {
-    try {
-      // ambil dari localStorage
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
+    const parsed = readJSON(key);
+    if (!Array.isArray(parsed)) return;
 
-        // hitung dataA (point > 80)
-        const passedKana = parsed
-          .filter(item => item.character !== '-')
-          .filter(item => item.points >= 80).length;
+    const filtered = parsed.filter((item) => item && item.character !== '-');
+    const masteredKana = filtered.filter((item) => Number(item.points) >= PASS_THRESHOLD).length;
+    const totalKana = filtered.length;
 
-        // hitung dataB (total data)
-        const totalKana = parsed
-          .filter(item => item.character !== '-')
-          .length;
-
-        setData({ masteredKana: passedKana, totalKana: totalKana });
-      }
-    } catch (err) {
-      console.error("Error parsing localStorage data:", err);
-    }
+    setProgress({ masteredKana, totalKana });
   }, [key]);
 
-  return data;
-}
+  return progress;
+};
 
-export const getCurrentDakuonProgress = (key) => {
-  const [data, setData] = useState({ masteredDakuon: 0, totalDakuon: 0 });
+/** Backward-compatible alias */
+export const getCurrentKanaProgress = useKanaProgress;
 
-  useEffect(() => {
-    try {
-      // ambil dari localStorage
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-
-        // hitung dataA (point > 80)
-        const dataA = parsed.filter(item => item.points >= 80).length;
-
-        // hitung dataB (total data)
-        const dataB = parsed.length;
-
-        setData({ masteredDakuon: dataA, totalDakuon: dataB });
-      }
-    } catch (err) {
-      console.error("Error parsing localStorage data:", err);
-    }
-  }, [key]);
-
-  return data;
-}
-
-export const getLocalHiraganaData = (key, initialValue) => {
-  // Always start with initialValue to prevent hydration mismatch
+/**
+ * Hook: useLocalHiraganaData
+ * Loads, validates (via unlock conditions), and persists hiragana data under `key`.
+ * Starts with `initialValue` to avoid hydration mismatches.
+ */
+export const useLocalHiraganaData = (key, initialValue) => {
+  console.log(`ini adalah useLocalHiraganaData`)
   const [value, setValue] = useState(initialValue);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Mark as hydrated and load from localStorage
-    setIsHydrated(true);
-    
-    try {
-      const storedValue = window.localStorage.getItem(key);
-      if (storedValue) {
-        const parsed = JSON.parse(storedValue);
-        const { data, changed } = checkUnlockConditions(parsed);
+    setHydrated(true);
 
-        if (changed) {
-          window.localStorage.setItem(key, JSON.stringify(data));
-          setValue(data);
-        } else {
-          setValue(parsed);
-        }
+    const parsed = readJSON(key);
+
+    if (parsed != null) {
+      const { data, changed } = checkUnlockConditions(parsed);
+      if (changed) {
+        writeJSON(key, data);
+        setValue(data);
+
+      console.log(`this is parse not null CHANGED`)
+
       } else {
-        window.localStorage.setItem(key, JSON.stringify(initialValue));
-        setValue(initialValue);
+      console.log(`this is parse not null NOT CHANGED`)
+
+        setValue(parsed);
       }
-    } catch (err) {
-      console.error("Error parsing localStorage data:", err);
+    } else {
+      console.log(`this is parse null`)
+
+      writeJSON(key, initialValue);
       setValue(initialValue);
     }
   }, [key]);
 
-  // Update localStorage when value changes (but only after hydration)
+  // Persist whenever value changes (post-hydration only)
   useEffect(() => {
-    if (isHydrated) {
-      try {
-        window.localStorage.setItem(key, JSON.stringify(value));
-      } catch (err) {
-        console.error("Error saving to localStorage:", err);
-      }
+    if (hydrated) {
+      writeJSON(key, value);
     }
-  }, [key, value, isHydrated]);
+  }, [key, value, hydrated]);
 
   return [value, setValue];
-}
+};
+
+/** Backward-compatible alias */
+export const getLocalHiraganaData = useLocalHiraganaData;

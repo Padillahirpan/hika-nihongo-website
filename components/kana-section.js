@@ -46,7 +46,7 @@ export const KanaSection = ({ title, data }) => {
   // Category mapping with their respective configurations
   const categories = [
     { key: "1", data: groupedData["1"], columns: 5, title: "Gojuon" }, // Basic kana
-    { key: "2", data: groupedData["2"], columns: 5, title: "Sokuon" }, // Sokuon
+    // { key: "2", data: groupedData["2"], columns: 5, title: "Sokuon" }, // Sokuon
     { key: "3", data: groupedData["3"], columns: 5, title: "Dakuon & Handakuon" }, // Dakuon & Handakuon
     { key: "4", data: groupedData["4"], columns: 3, title: "Youon" }, // Youon
   ];

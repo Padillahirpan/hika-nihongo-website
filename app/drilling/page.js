@@ -6,7 +6,7 @@ import formatDateTime from "../../util/date-format";
 import ProgressBar from "../../components/ProgressBar";
 import QuestionsItem from "../../components/QuestionsItem";
 import BackButton from "../../components/BackButton";
-import { useLocalStorage } from "../../hooks/user-local-storage";
+import { getLocalHiraganaData, useLocalStorage } from "../../hooks/user-local-storage";
 import { getAllHiragana } from "../../data/kana-data";
 import { generatePrioritizedQuestions } from "../../util/question-generator";
 import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
@@ -20,7 +20,7 @@ export default function HiraganaDrilling() {
   const { supported, speak } = useSpeechSynthesis("ja-JP");
   const { t } = useLanguage();
 
-  const [storedData, setStoredData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, getAllHiragana());  
+  const [hiraganaData, setHiraganaData] = useLocalStorage(HIRAGANA_DATA_PROGRESS, getAllHiragana());
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -49,13 +49,21 @@ export default function HiraganaDrilling() {
   };
 
   const loadPreviousResults = () => {
-    const results = JSON.parse(localStorage.getItem(DRILLING_RESULT) || "[]");
-    // Get last 5 results
-    setPreviousResults(results.slice(-5).reverse());
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(DRILLING_RESULT) : null;
+      const results = raw ? JSON.parse(raw) : [];
+      setPreviousResults(results.slice(-5).reverse());
+    } catch (e) {
+      console.error('Failed to load previous results', e);
+      setPreviousResults([]);
+    }
   };
 
   const generateQuestions = async () => {
-    const updatedHiraganaData = storedData.filter(item => item.unlocked);
+    console.log(`ini generateQuestions: ${JSON.stringify(hiraganaData.filter(item => item.unlocked).length)}`)
+    const updatedHiraganaData = (hiraganaData || []).filter(item => item.unlocked);
+
+    console.log(`this is generateQuestions: ${JSON.stringify(updatedHiraganaData)}`)
     const newQuestions = generatePrioritizedQuestions(updatedHiraganaData, 10);
     
     setQuestions(newQuestions);
@@ -65,13 +73,15 @@ export default function HiraganaDrilling() {
   useEffect(() => {
     generateQuestions();
     loadPreviousResults();
+    console.log(`ini useEffect: ${JSON.stringify(hiraganaData.filter(item => item.unlocked).length)}`)
+
   }, []);
 
   const checkAnswer = () => {
     if(selectedAnswer != null) {
       setShowResult(true);
       if (selectedAnswer.romaji === questions[currentQuestion].correctAnswer.romaji) {
-        setScore(score + 1);
+        setScore((prev) => prev + 1);
         // Update mastery level for correct answer
         updateMasteryLevel(selectedAnswer, true);
       } else {
@@ -94,7 +104,7 @@ export default function HiraganaDrilling() {
   const updateMasteryLevel = (kana, isCorrect) => {
     // Update points in stored data
 
-    const updatedData = storedData.map(item => {
+    const updatedData = (hiraganaData || []).map(item => {
       let points = item.points;
 
       if (isCorrect) {
@@ -109,7 +119,7 @@ export default function HiraganaDrilling() {
       return item;
     });
 
-    setStoredData(updatedData);
+    setHiraganaData(updatedData);
   };
 
   const handleNextQuestion = () => {
@@ -119,11 +129,12 @@ export default function HiraganaDrilling() {
       setShowResult(false);
 
       const nextQuestion = questions[currentQuestion + 1];
-      const questionsType = questions[currentQuestion].type
-      
-      // Pronounce the next question's correct answer
-      if (questionsType === "soundToKana" || questionsType === "kanaToSound") {
-        pronounceHiragana(nextQuestion.correctAnswer.character);
+      if (nextQuestion) {
+        if (nextQuestion.type === "soundToKana") {
+          pronounceHiragana(nextQuestion.correctAnswer.character);
+        } else if (nextQuestion.type === "kanaToSound") {
+          pronounceHiragana(nextQuestion.question);
+        }
       }
 
     } else {
@@ -142,24 +153,20 @@ export default function HiraganaDrilling() {
       type: testType.HIRAGANA.toString(),
     };
 
-    // Get existing results from localStorage
-    const existingResults = JSON.parse(
-      localStorage.getItem(DRILLING_RESULT) || "[]",
-    );
-
-    // Add new result
-    existingResults.push(result);
-
-    // Keep only the last 50 results to prevent localStorage from getting too large
-    if (existingResults.length > 50) {
-      existingResults.splice(0, existingResults.length - 50);
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(DRILLING_RESULT) : null;
+      const existingResults = raw ? JSON.parse(raw) : [];
+      existingResults.push(result);
+      if (existingResults.length > 50) {
+        existingResults.splice(0, existingResults.length - 50);
+      }
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(DRILLING_RESULT, JSON.stringify(existingResults));
+      }
+      loadPreviousResults();
+    } catch (e) {
+      console.error('Failed to save drilling result', e);
     }
-
-    // Save back to localStorage
-    localStorage.setItem(DRILLING_RESULT, JSON.stringify(existingResults));
-
-    // Update previous results display
-    loadPreviousResults();
   };
 
   const handleBackToHome = () => {
@@ -266,7 +273,7 @@ export default function HiraganaDrilling() {
           />
         </div>
         
-        <ProgressBar current={currentQuestion + 1} total={11} />
+        <ProgressBar current={currentQuestion + 1} total={questions.length || 10} />
         
         {/* Question Card */}
         <div className="min-h-full items-center justify-center">

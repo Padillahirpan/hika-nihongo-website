@@ -1,26 +1,31 @@
 "use client";
 
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import BackButton from "../../components/BackButton";
 import { getAllHiragana } from "../../data/kana-data";
 import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
 import { getLocalHiraganaData } from "../../hooks/user-local-storage";
 import { KanaSection } from "../../components/kana-section";
-import { useLanguage } from '../../contexts/language-context';
+import { useLanguage } from "../../contexts/language-context";
 
 export default function HiraganaPage() {
   const router = useRouter();
   const { t } = useLanguage();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(HIRAGANA_DATA_PROGRESS, getAllHiragana());
+  // Load and persist hiragana data in localStorage
+  const [hiraganaData] = getLocalHiraganaData(
+    HIRAGANA_DATA_PROGRESS,
+    getAllHiragana()
+  );
 
-  const handleBackToHome = () => {
+  const handleBackToHome = useCallback(() => {
     router.back();
-  };
+  }, [router]);
 
-  const handleDrillingClick = () => {
+  const handleDrillingClick = useCallback(() => {
     router.push("/drilling");
-  };
+  }, [router]);
 
   return (
     <main className="min-h-screen p-8 bg-white dark:bg-gray-900">
@@ -42,10 +47,7 @@ export default function HiraganaPage() {
           </p>
         </div>
 
-        <KanaSection
-          title="Hiragana"
-          data={dataKana}
-        />
+        <KanaSection title="Hiragana" data={hiraganaData} />
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
 

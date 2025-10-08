@@ -192,7 +192,7 @@ const KanjiGrid = ({ kanjiList }) => {
           />
         ))}
       </div>
-      <ButtonDrilling />
+      {/* <ButtonDrilling /> */}
       {selectedKanji && <KanjiDetailModal kanjiItem={selectedKanji} onClose={handleCloseDetail} />}
     </>
   );
