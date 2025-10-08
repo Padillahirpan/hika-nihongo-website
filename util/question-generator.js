@@ -5,19 +5,24 @@ const QUESTION_TYPES = {
   KANA_TO_SOUND: 'kanaToSound',
 };
 
+const highPriorityQty = 7
+const mediumPriorityQty = 2
+const lowPriorityQty = 1
+
 export const generatePrioritizedQuestions = (kanaData, count = 10) => {
   // Filter hanya kana yang unlocked
   const unlockedKanas = kanaData.filter(kana => kana.unlocked);
   
   // Kategorikan kana berdasarkan poin
-  const lowPriority = unlockedKanas.filter(kana => kana.points < 50);
-  const mediumPriority = unlockedKanas.filter(kana => kana.points >= 50 && kana.points <= 70);
-  const highPriority = unlockedKanas.filter(kana => kana.points > 70 && kana.points <= 100);
+  
+  const lowPriorityKanas = unlockedKanas.filter(kana => kana.points > 70 && kana.points <= 100)
+  const mediumPriorityKanas = unlockedKanas.filter(kana => kana.points >= 40 && kana.points <= 70);
+  const highPriorityKanas = unlockedKanas.filter(kana => kana.points < 40);
   
   // Hitung jumlah pertanyaan per kategori (7:2:1)
-  const lowCount = Math.min(7, lowPriority.length);
-  const mediumCount = Math.min(2, mediumPriority.length);
-  const highCount = Math.min(1, highPriority.length);
+  const lowCount = Math.min(lowPriorityQty, lowPriorityKanas.length);
+  const mediumCount = Math.min(mediumPriorityQty, mediumPriorityKanas.length);
+  const highCount = Math.min(highPriorityQty, highPriorityKanas.length);
   
   // Jika kategori lowPriority kurang, distribusikan ke kategori lainnya
   let remaining = count - (lowCount + mediumCount + highCount);
@@ -25,13 +30,13 @@ export const generatePrioritizedQuestions = (kanaData, count = 10) => {
   let extraHigh = 0;
 
   if (remaining > 0) {
-    if (mediumPriority.length > mediumCount) {
-      extraMedium = Math.min(remaining, mediumPriority.length - mediumCount);
+    if (mediumPriorityKanas.length > mediumCount) {
+      extraMedium = Math.min(remaining, mediumPriorityKanas.length - mediumCount);
       remaining -= extraMedium;
     }
     
-    if (remaining > 0 && highPriority.length > highCount) {
-      extraHigh = Math.min(remaining, highPriority.length - highCount);
+    if (remaining > 0 && highPriorityKanas.length > lowCount) {
+      extraHigh = Math.min(remaining, highPriorityKanas.length - highCount);
       remaining -= extraHigh;
     }
     
@@ -49,11 +54,11 @@ export const generatePrioritizedQuestions = (kanaData, count = 10) => {
           const kana = allKanas[randomIndex];
           
           if (kana.points < 50) {
-            lowPriority.push(kana);
+            highPriorityKanas.push(kana);
           } else if (kana.points <= 70) {
-            mediumPriority.push(kana);
+            mediumPriorityKanas.push(kana);
           } else {
-            highPriority.push(kana);
+            lowPriorityKanas.push(kana);
           }
 
           remaining--;
@@ -81,10 +86,10 @@ export const generatePrioritizedQuestions = (kanaData, count = 10) => {
   };
   
   // Pilih kana dari setiap kategori
-  const selectedLow = selectRandomKanas(lowPriority, lowCount);
-  const selectedMedium = selectRandomKanas(mediumPriority, mediumCount + extraMedium);
-  const selectedHigh = selectRandomKanas(highPriority, highCount + extraHigh);
-  
+  const selectedLow = selectRandomKanas(lowPriorityKanas, lowCount);
+  const selectedMedium = selectRandomKanas(mediumPriorityKanas, mediumCount + extraMedium);
+  const selectedHigh = selectRandomKanas(highPriorityKanas, highCount + extraHigh);
+
   // Gabungkan semua kana yang terpilih
   const selectedKanas = [...selectedLow, ...selectedMedium, ...selectedHigh];
   
