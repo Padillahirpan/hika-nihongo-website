@@ -1,7 +1,7 @@
-import HiraganaCard from "./HiraganaCard";
-import EmptyCard from "./EmptyCard";
-import { groupByCategory } from "../util/unlock-logic";
-import { getCategoryInfo } from "../util/category-info";
+import HiraganaCard from './HiraganaCard';
+import EmptyCard from './EmptyCard';
+import { groupByCategory } from '../util/unlock-logic';
+import { getCategoryInfo } from '../util/category-info';
 
 // Reusable component for rendering kana cards
 const KanaGrid = ({ data, columns = 5 }) => {
@@ -9,8 +9,8 @@ const KanaGrid = ({ data, columns = 5 }) => {
 
   // Use static classes for Tailwind CSS compatibility
   const gridClasses = {
-    3: "grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-4",
-    5: "grid grid-cols-5 md:grid-cols-5 lg:grid-cols-5 gap-2 sm:gap-4"
+    3: 'grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-4',
+    5: 'grid grid-cols-5 md:grid-cols-5 lg:grid-cols-5 gap-2 sm:gap-4',
   };
 
   const gridClass = gridClasses[columns] || gridClasses[5];
@@ -19,7 +19,7 @@ const KanaGrid = ({ data, columns = 5 }) => {
     <div className={gridClass}>
       {data.map((item, index) => (
         <div key={`${item.character}-${index}`} className="flex justify-center">
-          {item.character !== "-" ? (
+          {item.character !== '-' ? (
             <HiraganaCard
               kana={item.character}
               romaji={item.romaji}
@@ -45,10 +45,15 @@ export const KanaSection = ({ title, data }) => {
 
   // Category mapping with their respective configurations
   const categories = [
-    { key: "1", data: groupedData["1"], columns: 5, title: "Gojuon" }, // Basic kana
+    { key: '1', data: groupedData['1'], columns: 5, title: 'Gojuon' }, // Basic kana
     // { key: "2", data: groupedData["2"], columns: 5, title: "Sokuon" }, // Sokuon
-    { key: "3", data: groupedData["3"], columns: 5, title: "Dakuon & Handakuon" }, // Dakuon & Handakuon
-    { key: "4", data: groupedData["4"], columns: 3, title: "Youon" }, // Youon
+    {
+      key: '3',
+      data: groupedData['3'],
+      columns: 5,
+      title: 'Dakuon & Handakuon',
+    }, // Dakuon & Handakuon
+    { key: '4', data: groupedData['4'], columns: 3, title: 'Youon' }, // Youon
   ];
 
   return (
@@ -56,7 +61,9 @@ export const KanaSection = ({ title, data }) => {
       {categories.map((category, index) => (
         <div key={category.key}>
           <div className="flex items-center gap-1 mb-2">
-            <h2 className="text-lg sm:text-3xl font-bold text-left font-jakarta text-gray-800 dark:text-gray-100">{category.title}</h2>
+            <h2 className="text-lg sm:text-3xl font-bold text-left font-jakarta text-gray-800 dark:text-gray-100">
+              {category.title}
+            </h2>
             <button
               onClick={() => {
                 // Show popup with category information

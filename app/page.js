@@ -6,7 +6,10 @@ import Link from 'next/link';
 import BubbleGradient from '../components/BubbleGradient';
 import ProgressBar from '../components/ProgressBar';
 import { welcomeText } from '../data/welcome-data';
-import { HIRAGANA_DATA_PROGRESS, KATAKANA_DATA_PROGRESS } from '../hooks/cons-storage';
+import {
+  HIRAGANA_DATA_PROGRESS,
+  KATAKANA_DATA_PROGRESS,
+} from '../hooks/cons-storage';
 import { getCurrentKanaProgress } from '../hooks/user-local-storage';
 import { useLanguage } from '../contexts/language-context';
 
@@ -44,8 +47,10 @@ export default function HomePage() {
   const [showText, setShowText] = useState(true);
   const { language } = useLanguage();
 
-  const { masteredKana: hiraganaKana, totalKana: hiraganaTotal } = getCurrentKanaProgress(HIRAGANA_DATA_PROGRESS);
-  const { masteredKana: katakanaKana, totalKana: katakanaTotal } = getCurrentKanaProgress(KATAKANA_DATA_PROGRESS);
+  const { masteredKana: hiraganaKana, totalKana: hiraganaTotal } =
+    getCurrentKanaProgress(HIRAGANA_DATA_PROGRESS);
+  const { masteredKana: katakanaKana, totalKana: katakanaTotal } =
+    getCurrentKanaProgress(KATAKANA_DATA_PROGRESS);
 
   useEffect(() => {
     let timeoutId;
@@ -56,7 +61,9 @@ export default function HomePage() {
       }
 
       timeoutId = setTimeout(() => {
-        setCurrentTextIndex((prevIndex) => (prevIndex + 1) % welcomeText.length);
+        setCurrentTextIndex(
+          (prevIndex) => (prevIndex + 1) % welcomeText.length,
+        );
         setShowText(true);
       }, 2000);
     }, 6000);
@@ -123,7 +130,9 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="relative items-center justify-center text-center">
-          <h1 className="mb-6 text-center text-6xl font-bold text-gray-800 dark:text-gray-100 font-noto-jp">HikaGo Nihongo N5</h1>
+          <h1 className="mb-6 text-center text-6xl font-bold text-gray-800 dark:text-gray-100 font-noto-jp">
+            Hika no Gakusei
+          </h1>
           <div className="typewriter-container flex min-h-[4.5rem] flex-col items-center justify-center text-center text-xl">
             {showText && (
               <>
@@ -131,7 +140,9 @@ export default function HomePage() {
                   {welcomeText[currentTextIndex].japanese}
                 </div>
                 <div className="mt-1 text-gray-600 dark:text-gray-400 font-jakarta">
-                  {language === 'id' ? welcomeText[currentTextIndex].id : welcomeText[currentTextIndex].english}
+                  {language === 'id'
+                    ? welcomeText[currentTextIndex].id
+                    : welcomeText[currentTextIndex].english}
                 </div>
               </>
             )}
@@ -150,7 +161,12 @@ export default function HomePage() {
       <div className="fixed left-0 right-0 bottom-8 flex items-center justify-center gap-4 px-4 sm:bottom-4 xl:bottom-32 z-50">
         <div className="flex w-11/12 max-w-4xl flex-col items-center gap-4">
           {navigationSections.map(({ href, title, progress }) => (
-            <NavigationCard key={href} href={href} title={title} progress={progress} />
+            <NavigationCard
+              key={href}
+              href={href}
+              title={title}
+              progress={progress}
+            />
           ))}
         </div>
       </div>

@@ -1,56 +1,58 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
-import BackButton from "../../components/BackButton";
-import { getAllHiragana } from "../../data/kana-data";
-import { HIRAGANA_DATA_PROGRESS } from "../../hooks/cons-storage";
-import { getLocalHiraganaData } from "../../hooks/user-local-storage";
-import { KanaSection } from "../../components/kana-section";
-import { useLanguage } from "../../contexts/language-context";
+import { useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import BackButton from '../../components/BackButton';
+import { KanaSection } from '../../components/kana-section';
+import { useLanguage } from '../../contexts/language-context';
+import {
+  useGetUpdatedHiragana,
+  useIsHydrated,
+} from '../../stores/hiragana-store';
 
 export default function HiraganaPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const isHydrated = useIsHydrated();
 
-  // Load and persist hiragana data in localStorage
-  const [hiraganaData] = getLocalHiraganaData(
-    HIRAGANA_DATA_PROGRESS,
-    getAllHiragana()
-  );
+  const getUpdateHiragana = useGetUpdatedHiragana();
+  const hiraganaData = getUpdateHiragana();
 
   const handleBackToHome = useCallback(() => {
     router.back();
   }, [router]);
 
   const handleDrillingClick = useCallback(() => {
-    router.push("/drilling");
+    router.push('/drilling');
   }, [router]);
 
   return (
     <main className="min-h-screen p-8 bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <BackButton 
-          handleBackToHome={handleBackToHome}
-        />
-        
+        <BackButton handleBackToHome={handleBackToHome} />
+
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta text-gray-800 dark:text-gray-100">
           Hiragana
         </h1>
-        <div className="w-full bg-rose-300 dark:bg-rose-400 p-4 rounded-lg mb-4 flex flex-col justify-center" >
+        <div className="w-full bg-rose-300 dark:bg-rose-400 p-4 rounded-lg mb-4 flex flex-col justify-center">
           <p className="text-l font-regular text-white text-left font-jakarta">
-          {t('instructions.flip')}
+            {t('instructions.flip')}
           </p>
           <p className="text-l font-regular text-white text-left font-jakarta">
             {t('instructions.sound')}
           </p>
         </div>
 
-        <KanaSection title="Hiragana" data={hiraganaData} />
+        {isHydrated ? (
+          <KanaSection title="Hiragana" data={hiraganaData} />
+        ) : (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        )}
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
       </div>
 
       {/* Drilling Button */}

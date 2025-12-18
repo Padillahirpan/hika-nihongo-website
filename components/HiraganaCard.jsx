@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useSpeechSynthesis } from "../util/use-speech-synthesis.js";
+import { useState, useEffect } from 'react';
+import { useSpeechSynthesis } from '../util/use-speech-synthesis.js';
 
 /**
  * HiraganaCard Component
@@ -11,10 +11,10 @@ import { useSpeechSynthesis } from "../util/use-speech-synthesis.js";
  * @param {string} props.romaji - The romaji (romanized) version of the hiragana
  * @param {number} props.masteryLevel - The mastery level (0-100) of this character
  */
-const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
+const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { supported, speak } = useSpeechSynthesis("ja-JP");
+  const { supported, speak } = useSpeechSynthesis('ja-JP');
 
   useEffect(() => {
     setIsMounted(true);
@@ -29,51 +29,53 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
   const pronounceHiragana = (e) => {
     e.stopPropagation();
     if (!supported) {
-      console.error("Web Speech API is not supported in this browser");
+      console.error('Web Speech API is not supported in this browser');
       return;
     }
     speak(kana, {
-      lang: "ja-JP",
+      lang: 'ja-JP',
       rate: 0.8,
       pitch: 1,
       volume: 5,
-      voiceName: "Google 日本語", // optionally lock a specific voice
-      onStart: () => console.log("Pronouncing:", kana),
-      onEnd: () => console.log("Done"),
-      onError: (e) => console.error("TTS error:", e.error),
+      voiceName: 'Google 日本語', // optionally lock a specific voice
+      onStart: () => console.log('Pronouncing:', kana),
+      onEnd: () => console.log('Done'),
+      onError: (e) => console.error('TTS error:', e.error),
     });
   };
 
   // Determine background color based on mastery level
   const getBackgroundColor = () => {
     // During SSR, return a safe default to prevent hydration mismatch
-    if (!isMounted) return "bg-white dark:bg-gray-800";
-    
-    if (masteryLevel === 0) return "bg-white dark:bg-gray-800";
-    if (masteryLevel >= 1 && masteryLevel <= 19) return "bg-rose-100 dark:bg-rose-900";
-    if (masteryLevel >= 20 && masteryLevel <= 39) return "bg-rose-300 dark:bg-rose-700";
-    if (masteryLevel >= 40 && masteryLevel <= 59) return "bg-rose-500 dark:bg-rose-600";
-    if (masteryLevel >= 60 && masteryLevel <= 79) return "bg-rose-700 dark:bg-rose-500";
-    return "bg-rose-600 dark:bg-rose-400"; // masteryLevel >= 80
+    if (!isMounted) return 'bg-white dark:bg-gray-800';
+
+    if (masteryLevel === 0) return 'bg-white dark:bg-gray-800';
+    if (masteryLevel >= 1 && masteryLevel <= 19)
+      return 'bg-rose-100 dark:bg-rose-900';
+    if (masteryLevel >= 20 && masteryLevel <= 39)
+      return 'bg-rose-300 dark:bg-rose-700';
+    if (masteryLevel >= 40 && masteryLevel <= 59)
+      return 'bg-rose-500 dark:bg-rose-600';
+    if (masteryLevel >= 60 && masteryLevel <= 79)
+      return 'bg-rose-600 dark:bg-rose-500';
+    return 'bg-rose-700 dark:bg-rose-400'; // masteryLevel >= 80
   };
 
   // Determine text color based on mastery level
   const getTextColor = () => {
     // During SSR, return a safe default to prevent hydration mismatch
-    if (!isMounted) return "text-black dark:text-white";
-    
-    if (masteryLevel === 0) return "text-black dark:text-white";
-    if (masteryLevel < 20) return "text-rose-800 dark:text-rose-200";
-    if (masteryLevel < 40) return "text-rose-600 dark:text-rose-300";
-    return "text-white"; // masteryLevel >= 40
+    if (!isMounted) return 'text-black dark:text-white';
+
+    if (masteryLevel === 0) return 'text-black dark:text-white';
+    if (masteryLevel < 20) return 'text-rose-800 dark:text-rose-200';
+    if (masteryLevel < 40) return 'text-rose-600 dark:text-rose-300';
+    return 'text-white'; // masteryLevel >= 40
   };
 
   if (!unlocked) {
     return (
       <div className="flex w-full h-[80px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
-        <div
-          className="flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md bg-gray-200 dark:bg-gray-700"
-        >
+        <div className="flex w-full h-full flex-col items-center justify-center rounded-lg shadow-md bg-gray-200 dark:bg-gray-700">
           <span className="text-xs sm:text-6xl font-bold text-gray-400 dark:text-gray-500 font-noto-jp">
             {kana}
           </span>
@@ -90,17 +92,20 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
       <div
         className="flex w-full h-full transition-transform duration-700"
         style={{
-          transformStyle: "preserve-3d",
-          transform: isFlipped ? "rotateY(180deg)" : "",
+          transformStyle: 'preserve-3d',
+          transform: isFlipped ? 'rotateY(180deg)' : '',
         }}
       >
         {/* Front of card (Hiragana) */}
         <div
           className={`flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden]`}
         >
-          <span className={`text-xs sm:text-6xl font-bold ${getTextColor()} font-noto-jp`}>
+          <span
+            className={`text-xs sm:text-6xl font-bold ${getTextColor()} font-noto-jp`}
+          >
             {kana}
           </span>
+
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
             <button
               onClick={pronounceHiragana}
@@ -129,7 +134,9 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0 , unlocked = false}) => {
         <div
           className={`absolute w-full h-full flex items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden] [transform:rotateY(180deg)]`}
         >
-          <span className={`text-lg sm:text-4xl font-bold ${getTextColor()} font-noto-jp`}>
+          <span
+            className={`text-lg sm:text-4xl font-bold ${getTextColor()} font-noto-jp`}
+          >
             {romaji}
           </span>
         </div>
