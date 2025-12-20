@@ -20,9 +20,6 @@ export default function HiraganaPage() {
 
   // Get updated hiragana data with unlock conditions
   const updatedHiraganaData = useMemo(() => {
-    console.log(
-      `Updating hiragana data... when the data is: ${currentHiraganaData.length}`,
-    );
     if (currentHiraganaData.length === 0) {
       return getUpdatedHiragana();
     }
