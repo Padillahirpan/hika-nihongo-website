@@ -1,171 +1,189 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/shallow';
-import {
-  generatePrioritizedQuestions,
-  generateOptimizedQuestions,
-} from '../util/question-generator';
+import { generateOptimizedQuestions } from '../util/question-generator';
 import { testType } from '../data/kana-data';
 import { getAllHiragana } from '../data/kana-data';
 import { DRILLING } from '../constants';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-export const useDrillingStore = create((set, get, store) => ({
-  // State
-  hiraganaData: [],
-  questions: [],
-  currentQuestionIndex: 0,
-  score: 0,
-  selectedAnswer: null,
-  showResult: false,
-  isFinished: false,
-  previousResults: [],
-  currentTestType: testType.HIRAGANA,
-  currentQuestion: {},
+export const useDrillingStore = create(
+  persist(
+    (set, get, store) => ({
+      // State
 
-  updateHiraganaData: async (updatedHiraganaData) => {
-    const hiragana = updatedHiraganaData || getAllHiragana();
-    set({ hiraganaData: hiragana });
-  },
+      previousResults: [],
 
-  // Actions
-  setTestType: (type) => {
-    set({ currentTestType: type });
-  },
-
-  generateQuestions: async () => {
-    const updatedKanaData = get().hiraganaData.filter((item) => item.unlocked);
-    const newQuestions = generateOptimizedQuestions(updatedKanaData);
-
-    set({
-      questions: newQuestions,
+      hiraganaData: [],
+      questions: [],
       currentQuestionIndex: 0,
       score: 0,
       selectedAnswer: null,
       showResult: false,
       isFinished: false,
-      currentQuestion: newQuestions[0],
-    });
-  },
+      currentTestType: testType.HIRAGANA,
+      currentQuestion: {},
 
-  selectAnswer: (answer) => {
-    set({ selectedAnswer: answer });
-  },
+      updateHiraganaData: async (updatedHiraganaData) => {
+        const hiragana = updatedHiraganaData || getAllHiragana();
+        set({ hiraganaData: hiragana });
+      },
 
-  checkAnswer: (updateMasteryLevel) => {
-    const { selectedAnswer, questions, currentQuestionIndex } = get();
+      // Actions
+      setTestType: (type) => {
+        set({ currentTestType: type });
+      },
 
-    if (selectedAnswer != null) {
-      const isCorrect =
-        selectedAnswer.romaji ===
-        questions[currentQuestionIndex].correctAnswer.romaji;
+      generateQuestions: async () => {
+        const { hiraganaData } = get();
+        const updatedKanaData = hiraganaData.filter((item) => item.unlocked);
+        const newQuestions = generateOptimizedQuestions(updatedKanaData);
 
-      set({ showResult: true });
+        set({
+          questions: newQuestions,
+          currentQuestionIndex: 0,
+          score: 0,
+          selectedAnswer: null,
+          showResult: false,
+          isFinished: false,
+          currentQuestion: newQuestions[0],
+        });
+      },
 
-      if (isCorrect) {
-        set((state) => ({ score: state.score + 1 }));
-      }
+      selectAnswer: (answer) => {
+        set({ selectedAnswer: answer });
+      },
 
-      // Update mastery level through callback
-      updateMasteryLevel(selectedAnswer, isCorrect);
-    }
-  },
+      checkAnswer: (updateMasteryLevel) => {
+        const { selectedAnswer, currentQuestion } = get();
 
-  nextQuestion: () => {
-    const { currentQuestionIndex, score, currentTestType, questions } = get();
+        if (selectedAnswer != null) {
+          const isCorrect =
+            selectedAnswer.romaji === currentQuestion.correctAnswer.romaji;
 
-    if (currentQuestionIndex < DRILLING.QUESTIONS_PER_DRILL - 1) {
-      set({
-        currentQuestionIndex: currentQuestionIndex + 1,
-        selectedAnswer: null,
-        showResult: false,
-        currentQuestion: questions[currentQuestionIndex + 1],
-      });
-    } else {
-      // Create the result object
-      const result = {
-        score: score,
-        totalQuestions: DRILLING.QUESTIONS_PER_DRILL,
-        percentage: Math.round((score / DRILLING.QUESTIONS_PER_DRILL) * DRILLING.PROGRESS_PERCENTAGE_MULTIPLIER),
-        date: new Date().toISOString(),
-        timestamp: Date.now(),
-        type: currentTestType.toString(),
-      };
+          set({ showResult: true });
 
-      // Combine isFinished and saveDrillingResult into one atomic update
-      set((state) => {
-        const existingResults = state.previousResults || [];
-        const newResults = [...existingResults, result];
+          if (isCorrect) {
+            set((state) => ({ score: state.score + 1 }));
+          }
 
-        // Keep only the last MAX_RESULTS
-        if (newResults.length > DRILLING.MAX_RESULTS) {
-          return {
-            isFinished: true,
-            previousResults: newResults.slice(-DRILLING.MAX_RESULTS),
-          };
+          // Update mastery level through callback
+          updateMasteryLevel(currentQuestion.correctAnswer, isCorrect);
         }
+      },
 
-        return {
-          isFinished: true,
-          previousResults: newResults,
+      nextQuestion: () => {
+        const { currentQuestionIndex, score, currentTestType, questions } =
+          get();
+
+        if (currentQuestionIndex < DRILLING.QUESTIONS_PER_DRILL - 1) {
+          set({
+            currentQuestionIndex: currentQuestionIndex + 1,
+            selectedAnswer: null,
+            showResult: false,
+            currentQuestion: questions[currentQuestionIndex + 1],
+          });
+        } else {
+          // Create the result object
+          const result = {
+            score: score,
+            totalQuestions: DRILLING.QUESTIONS_PER_DRILL,
+            percentage: Math.round(
+              (score / DRILLING.QUESTIONS_PER_DRILL) *
+                DRILLING.PROGRESS_PERCENTAGE_MULTIPLIER,
+            ),
+            date: new Date().toISOString(),
+            timestamp: Date.now(),
+            type: currentTestType.toString(),
+          };
+
+          // Combine isFinished and saveDrillingResult into one atomic update
+          set((state) => {
+            const existingResults = state.previousResults || [];
+            const newResults = [...existingResults, result];
+
+            // Keep only the last MAX_RESULTS
+            if (newResults.length > DRILLING.MAX_RESULTS) {
+              return {
+                isFinished: true,
+                previousResults: newResults.slice(-DRILLING.MAX_RESULTS),
+              };
+            }
+
+            return {
+              isFinished: true,
+              previousResults: newResults,
+            };
+          });
+        }
+      },
+
+      saveDrillingResult: () => {
+        const { score, currentTestType } = get();
+
+        const result = {
+          score: score,
+          totalQuestions: DRILLING.QUESTIONS_PER_DRILL,
+          percentage: Math.round(
+            (score / DRILLING.QUESTIONS_PER_DRILL) *
+              DRILLING.PROGRESS_PERCENTAGE_MULTIPLIER,
+          ),
+          date: new Date().toISOString(),
+          timestamp: Date.now(),
+          type: currentTestType.toString(),
         };
-      });
-    }
-  },
 
-  saveDrillingResult: () => {
-    const { score, currentTestType } = get();
+        set((state) => {
+          const existingResults = state.previousResults || [];
+          const newResults = [...existingResults, result];
 
-    const result = {
-      score: score,
-      totalQuestions: DRILLING.QUESTIONS_PER_DRILL,
-      percentage: Math.round((score / DRILLING.QUESTIONS_PER_DRILL) * DRILLING.PROGRESS_PERCENTAGE_MULTIPLIER),
-      date: new Date().toISOString(),
-      timestamp: Date.now(),
-      type: currentTestType.toString(),
-    };
+          // Keep only the last MAX_RESULTS
+          if (newResults.length > DRILLING.MAX_RESULTS) {
+            return { previousResults: newResults.slice(-DRILLING.MAX_RESULTS) };
+          }
 
-    set((state) => {
-      const existingResults = state.previousResults || [];
-      const newResults = [...existingResults, result];
+          return { previousResults: newResults };
+        });
+      },
 
-      // Keep only the last MAX_RESULTS
-      if (newResults.length > DRILLING.MAX_RESULTS) {
-        return { previousResults: newResults.slice(-DRILLING.MAX_RESULTS) };
-      }
+      restartDrilling: () => {
+        const { generateQuestions } = get();
+        generateQuestions();
+      },
 
-      return { previousResults: newResults };
-    });
-  },
+      loadPreviousResults: () => {
+        // Results are stored in memory only
+        return get().previousResults.slice(-5).reverse();
+      },
 
-  restartDrilling: () => {
-    const { generateQuestions, hiraganaData } = get();
-    generateQuestions(hiraganaData);
-  },
+      getRecentResults: (limit = 5) => {
+        return get().previousResults.slice(-limit).reverse();
+      },
 
-  loadPreviousResults: () => {
-    // Results are stored in memory only
-    return get().previousResults.slice(-5).reverse();
-  },
+      clearResults: () => {
+        set({ previousResults: [] });
+      },
 
-  getRecentResults: (limit = 5) => {
-    return get().previousResults.slice(-limit).reverse();
-  },
+      getCurrentQuestion: () => {
+        const { currentQuestion, isFinished } = get();
+        if (isFinished) {
+          return null;
+        }
+        return currentQuestion;
+      },
 
-  clearResults: () => {
-    set({ previousResults: [] });
-  },
-
-  getCurrentQuestion: () => {
-    const { currentQuestion, isFinished } = get();
-    if (isFinished) {
-      return null;
-    }
-    return currentQuestion;
-  },
-
-  resetDrilling: () => {
-    store.getInitialState();
-  },
-}));
+      resetDrilling: () => {
+        store.getInitialState();
+      },
+    }),
+    {
+      name: 'drilling-storage', // name of the item in localStorage
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        previousResults: state.previousResults,
+      }),
+    },
+  ),
+);
 
 // Optimized selector hooks for better performance
 export const useDrillingHiraganaData = () =>

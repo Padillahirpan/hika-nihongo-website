@@ -1,3 +1,7 @@
+'use client';
+
+import { useMemo, useCallback } from 'react';
+import { ErrorBoundary } from './ErrorBoundary';
 import HiraganaCard from './HiraganaCard';
 import EmptyCard from './EmptyCard';
 import { groupByCategory } from '../util/unlock-logic';
@@ -20,12 +24,14 @@ const KanaGrid = ({ data, columns = 5 }) => {
       {data.map((item, index) => (
         <div key={`${item.character}-${index}`} className="flex justify-center">
           {item.character !== '-' ? (
-            <HiraganaCard
-              kana={item.character}
-              romaji={item.romaji}
-              masteryLevel={item.points}
-              unlocked={item.unlocked}
-            />
+            <ErrorBoundary>
+              <HiraganaCard
+                kana={item.character}
+                romaji={item.romaji}
+                masteryLevel={item.points}
+                unlocked={item.unlocked}
+              />
+            </ErrorBoundary>
           ) : (
             <EmptyCard />
           )}
@@ -41,10 +47,13 @@ const SectionSpacer = () => (
 );
 
 export const KanaSection = ({ title, data }) => {
-  const groupedData = groupByCategory(data);
+  // Memoize grouped data to prevent unnecessary recalculations
+  const groupedData = useMemo(() => {
+    return groupByCategory(data);
+  }, [data]);
 
-  // Category mapping with their respective configurations
-  const categories = [
+  // Memoize categories array to prevent recreation on every render
+  const categories = useMemo(() => [
     { key: '1', data: groupedData['1'], columns: 5, title: 'Gojuon' }, // Basic kana
     // { key: "2", data: groupedData["2"], columns: 5, title: "Sokuon" }, // Sokuon
     {
@@ -54,7 +63,14 @@ export const KanaSection = ({ title, data }) => {
       title: 'Dakuon & Handakuon',
     }, // Dakuon & Handakuon
     { key: '4', data: groupedData['4'], columns: 3, title: 'Youon' }, // Youon
-  ];
+  ], [groupedData]);
+
+  const handleInfoClick = useCallback((categoryTitle) => {
+    // Show popup with category information
+    const info = getCategoryInfo(categoryTitle);
+    // Replace with proper modal in future
+    alert(info);
+  }, []);
 
   return (
     <>
@@ -65,10 +81,7 @@ export const KanaSection = ({ title, data }) => {
               {category.title}
             </h2>
             <button
-              onClick={() => {
-                // Show popup with category information
-                alert(getCategoryInfo(category.title));
-              }}
+              onClick={() => handleInfoClick(category.title)}
               className="mt-2 mb-2 hover:text-blue-500 transition-colors"
               title="Click for more information"
             >

@@ -1,22 +1,35 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '../../components/BackButton';
 import { KanaSection } from '../../components/kana-section';
 import { useLanguage } from '../../contexts/language-context';
 import {
-  useGetUpdatedHiragana,
-  useIsHydrated,
+  useHiraganaWithProgress,
+  useHiraganaActions,
 } from '../../stores/hiragana-store';
 
 export default function HiraganaPage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const isHydrated = useIsHydrated();
 
-  const getUpdateHiragana = useGetUpdatedHiragana();
-  const hiraganaData = getUpdateHiragana();
+  // Optimized Zustand hooks - combined into single call instead of 2
+  const { currentHiraganaData, isHydrated, getUpdatedHiragana } =
+    useHiraganaWithProgress();
+
+  // Get updated hiragana data with unlock conditions
+  const updatedHiraganaData = useMemo(() => {
+    console.log(
+      `Updating hiragana data... when the data is: ${currentHiraganaData.length}`,
+    );
+    if (currentHiraganaData.length === 0) {
+      return getUpdatedHiragana();
+    }
+    return currentHiraganaData;
+  }, []);
+
+  // Iterate through the updated hiragana data
 
   const handleBackToHome = useCallback(() => {
     router.back();
@@ -45,10 +58,15 @@ export default function HiraganaPage() {
         </div>
 
         {isHydrated ? (
-          <KanaSection title="Hiragana" data={hiraganaData} />
+          <KanaSection title="Hiragana" data={updatedHiraganaData} />
         ) : (
           <div className="flex justify-center items-center py-12">
-            <div className="text-gray-500">Loading...</div>
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              <div className="text-gray-500 dark:text-gray-400">
+                Loading kana data...
+              </div>
+            </div>
           </div>
         )}
 

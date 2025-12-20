@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSpeechSynthesis } from '../util/use-speech-synthesis.js';
+import { useJapaneseSpeech } from '../hooks/useSpeechService';
+import { SPEECH } from '../constants';
 
 /**
  * HiraganaCard Component
@@ -14,7 +15,12 @@ import { useSpeechSynthesis } from '../util/use-speech-synthesis.js';
 const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const { supported, speak } = useSpeechSynthesis('ja-JP');
+  const { canSpeak, speakKana, isSpeaking } = useJapaneseSpeech({
+    rate: SPEECH.RATE,
+    pitch: SPEECH.PITCH,
+    volume: SPEECH.VOLUME,
+    voiceName: SPEECH.VOICE_NAME,
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -25,22 +31,27 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
     setIsFlipped(!isFlipped);
   };
 
-  //   // Function to pronounce the hiragana using Web Speech API
+  // Function to pronounce the hiragana using new SpeechService
   const pronounceHiragana = (e) => {
     e.stopPropagation();
-    if (!supported) {
-      console.error('Web Speech API is not supported in this browser');
+    if (!canSpeak) {
+      console.warn('Speech synthesis is not supported in this browser');
       return;
     }
-    speak(kana, {
-      lang: 'ja-JP',
-      rate: 0.8,
-      pitch: 1,
-      volume: 5,
-      voiceName: 'Google 日本語', // optionally lock a specific voice
-      onStart: () => console.log('Pronouncing:', kana),
-      onEnd: () => console.log('Done'),
-      onError: (e) => console.error('TTS error:', e.error),
+
+    // Create kana object for speech service
+    const kanaObj = { character: kana, romaji };
+
+    speakKana(kanaObj, {
+      onError: (error) => {
+        console.error('Speech service error:', error);
+      },
+      onStart: () => {
+        console.log('Pronouncing:', kana);
+      },
+      onEnd: () => {
+        console.log('Pronunciation completed for:', kana);
+      },
     });
   };
 
@@ -109,22 +120,41 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
           <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
             <button
               onClick={pronounceHiragana}
-              className="p-1 bg-sky-400 text-white rounded-full hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-300"
-              aria-label="Pronounce"
+              disabled={!canSpeak || isSpeaking}
+              className={`p-1 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-300 ${
+                !canSpeak
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : isSpeaking
+                    ? 'bg-red-400 text-white hover:bg-red-500'
+                    : 'bg-sky-400 text-white hover:bg-sky-500'
+              }`}
+              aria-label={isSpeaking ? 'Speaking...' : 'Pronounce'}
+              title={canSpeak ? 'Click to pronounce' : 'Speech not supported'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="lg:h-6 lg:w-6 md:h-4 md:w-4 h-4 w-4"
+                className={`lg:h-6 lg:w-6 md:h-4 md:w-4 h-4 w-4 ${
+                  isSpeaking ? 'animate-pulse' : ''
+                }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-                />
+                {isSpeaking ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                  />
+                )}
               </svg>
             </button>
           </div>

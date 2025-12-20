@@ -388,15 +388,5 @@ export const generateOptimizedQuestions = (kanaData) => {
     low: questions.filter((q) => q.originalPriority === 'low').length,
   };
 
-  console.log(
-    `Assigned distribution - High: ${assignedDistribution.high}, Medium: ${assignedDistribution.medium}, Low: ${assignedDistribution.low}`,
-  );
-  console.log(
-    `Original distribution - High: ${originalDistribution.high}, Medium: ${originalDistribution.medium}, Low: ${originalDistribution.low}`,
-  );
-  console.log(
-    `Generated ${questions.length} questions with ${usedKanaTypeCombos.size} unique kana-type combinations`,
-  );
-
   return questions;
 };

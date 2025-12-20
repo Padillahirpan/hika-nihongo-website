@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useJapaneseSpeech } from './useSpeechService';
 import { useHiraganaStore } from '../stores/hiragana-store';
-import {
-  useDrillingState,
-  useDrillingActions,
-} from '../stores/drilling-store';
+import { useDrillingState, useDrillingActions } from '../stores/drilling-store';
 import { LEARNING, SPEECH } from '../constants';
 import { LoadingStates } from '../components/LoadingState';
 
 export function useDrillingLogic() {
   const router = useRouter();
-  const { canSpeak, speakKana, isSpeaking, error: speechError } = useJapaneseSpeech({
+  const {
+    canSpeak,
+    speakKana,
+    isSpeaking,
+    error: speechError,
+  } = useJapaneseSpeech({
     rate: SPEECH.RATE,
     pitch: SPEECH.PITCH,
     volume: SPEECH.VOLUME,
@@ -27,9 +29,8 @@ export function useDrillingLogic() {
   const [loadingMessage, setLoadingMessage] = useState('');
 
   // Store hooks
-  const { getUpdatedHiragana, addOrUpdateKana, updateKanaByCharacter } = useHiraganaStore();
+  const { currentHiraganaData, updateKanaByCharacter } = useHiraganaStore();
   const {
-    hiragana,
     progressCurrent,
     progressTotal,
     score,
@@ -60,8 +61,10 @@ export function useDrillingLogic() {
         return;
       }
 
-      if (!kana || !kana.character) {
-        console.warn('Invalid kana character provided for pronunciation');
+      if (!kana) {
+        console.warn(
+          `Invalid kana character provided for pronunciation: ${kana.character}`,
+        );
         return;
       }
 
@@ -78,7 +81,7 @@ export function useDrillingLogic() {
         onStart: () => {
           if (options.onStart) options.onStart();
         },
-        ...options
+        ...options,
       });
     } catch (error) {
       console.error('Error in pronounceHiragana:', error);
@@ -97,20 +100,28 @@ export function useDrillingLogic() {
       }
 
       // Find current kana to get existing points
-      const currentKana = hiragana.find(item => item.character === kana.character);
+      const currentKana = currentHiraganaData.find(
+        (item) => item.character === kana.character,
+      );
       if (!currentKana) {
         console.warn(`Kana ${kana.character} not found in hiragana data`);
         return;
       }
 
       // Calculate new points efficiently using constants
-      const pointsChange = isCorrect ? LEARNING.MASTERY_POINTS_CORRECT : -LEARNING.MASTERY_POINTS_INCORRECT;
-      const newPoints = Math.max(LEARNING.MASTERY_MIN_POINTS,
-        Math.min(LEARNING.MASTERY_MAX_POINTS, currentKana.points + pointsChange)
+      const pointsChange = isCorrect
+        ? LEARNING.MASTERY_POINTS_CORRECT
+        : -LEARNING.MASTERY_POINTS_INCORRECT;
+      const newPoints = Math.max(
+        LEARNING.MASTERY_MIN_POINTS,
+        Math.min(
+          LEARNING.MASTERY_MAX_POINTS,
+          currentKana.points + pointsChange,
+        ),
       );
 
       // Direct update - O(1) operation instead of O(n) filter + map
-      updateKanaByCharacter(kana.character, { points: newPoints });
+      updateKanaByCharacter(kana.character, kana, { points: newPoints });
     } catch (error) {
       console.error('Error in updateMasteryLevel:', error);
       setError(error);
@@ -130,8 +141,7 @@ export function useDrillingLogic() {
         setLoadingState(LoadingStates.LOADING);
         setLoadingMessage('Loading kana data...');
 
-        const updatedHiragana = getUpdatedHiragana();
-        await updateHiraganaData(updatedHiragana);
+        await updateHiraganaData(currentHiraganaData);
 
         setLoadingMessage('Generating questions...');
         await generateQuestions();
@@ -153,7 +163,9 @@ export function useDrillingLogic() {
   // Answer checking logic
   const checkAnswer = () => {
     if (selectedAnswer != null) {
-      checkAnswerAction((kana, isCorrect) => updateMasteryLevel(kana, isCorrect));
+      checkAnswerAction((kana, isCorrect) =>
+        updateMasteryLevel(kana, isCorrect),
+      );
     }
   };
 
@@ -163,23 +175,22 @@ export function useDrillingLogic() {
 
     if (currentQ) {
       if (currentQ.type === 'kanaToSound') {
-        pronounceHiragana(selectedOption.character);
+        pronounceHiragana(selectedOption); // Pass the full option object, not just character
       }
     }
   };
 
   // Handle next question with pronunciation
   const handleNextQuestion = () => {
-    updateHiraganaData(getUpdatedHiragana());
     nextQuestion();
 
     const currentQuestionNew = getCurrentQuestionAction();
 
     if (currentQuestionNew) {
       if (currentQuestionNew.type === 'soundToKana') {
-        pronounceHiragana(currentQuestionNew.correctAnswer.character);
+        pronounceHiragana(currentQuestionNew.correctAnswer); // Pass full object, not just character
       } else if (currentQuestionNew.type === 'kanaToSound') {
-        pronounceHiragana(currentQuestionNew.question);
+        pronounceHiragana(currentQuestionNew.question); // question should be the full kana object
       }
     }
   };
@@ -191,7 +202,6 @@ export function useDrillingLogic() {
   };
 
   const handleRestartDrilling = () => {
-    updateHiraganaData(getUpdatedHiragana());
     restartDrilling();
   };
 
@@ -204,8 +214,6 @@ export function useDrillingLogic() {
     const initializeDrilling = async () => {
       try {
         setLoadingMessage('Retrying initialization...');
-        const updatedHiragana = getUpdatedHiragana();
-        await updateHiraganaData(updatedHiragana);
         await generateQuestions();
         loadPreviousResults();
         setLoadingState(LoadingStates.SUCCESS);

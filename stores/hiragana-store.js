@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useShallow } from 'zustand/shallow';
 import { checkUnlockConditions } from '../util/unlock-logic';
 import { getAllHiragana } from '../data/kana-data';
 import { LEARNING } from '../constants';
@@ -8,38 +9,21 @@ export const useHiraganaStore = create(
   persist(
     (set, get) => ({
       // State
-      hiraganaData: [], // Initialize with default data
+      hiraganaUnlocked: [], // Initialize with default data
+
+      currentHiraganaData: [],
       isHydrated: false,
-
-      // Actions
-      setHiraganaData: (data) => {
-        set({ hiraganaData: data });
-      },
-
-      // Initialize the store with initial data and check unlock conditions
-      initializeHiraganaData: () => {
-        const currentState = get();
-
-        // Prevent re-initialization if already has data
-        if (currentState.hiraganaData.length > 0) {
-          return;
-        }
-
-        const staticHiragana = getAllHiragana();
-        // Set initial data directly
-        set({ hiraganaData: staticHiragana });
-      },
 
       // Update a single kana item
       updateKanaItem: (index, updatedItem) => {
         const currentState = get();
-        const updatedData = [...currentState.hiraganaData];
+        const updatedData = [...currentState.currentHiraganaData];
         updatedData[index] = updatedItem;
 
         // Check unlock conditions after update
         const { data, changed } = checkUnlockConditions(updatedData);
 
-        set({ hiraganaData: data });
+        set({ hiraganaUnlocked: data });
 
         if (changed) {
           console.log('New content unlocked!');
@@ -47,26 +31,44 @@ export const useHiraganaStore = create(
       },
 
       // Update kana item by character
-      updateKanaByCharacter: (character, updates) => {
+      updateKanaByCharacter: (character, kana, updates) => {
         const currentState = get();
-        const updatedData = currentState.hiraganaData.map((item) =>
+        const updatedData = currentState.currentHiraganaData.map((item) =>
           item.character === character ? { ...item, ...updates } : item,
         );
 
-        // Check unlock conditions after update
+        currentState.updateUnlockedKana({ ...kana, ...updates });
+
         const { data, changed } = checkUnlockConditions(updatedData);
 
-        set({ hiraganaData: data });
+        set({ currentHiraganaData: data });
 
         if (changed) {
           console.log('New content unlocked!');
         }
       },
 
+      updateUnlockedKana: (newItem) => {
+        const currentState = get();
+        let existingData = currentState.hiraganaUnlocked;
+
+        const index = existingData.findIndex(
+          (item) => item.character === newItem.character,
+        );
+
+        if (index !== -1) {
+          existingData[index] = newItem;
+        } else {
+          existingData.push(newItem);
+        }
+
+        set({ hiraganaUnlocked: existingData });
+      },
+
       // Add or update kana items - adds new if not exists, updates if exists
       addOrUpdateKana: (newItems) => {
         const currentState = get();
-        const existingData = currentState.hiraganaData;
+        const existingData = currentState.currentHiraganaData;
 
         // Combine existing items (that weren't updated) with processed items
         const updatedCharacters = new Set(
@@ -81,7 +83,7 @@ export const useHiraganaStore = create(
         // Check unlock conditions after update
         const { data, changed } = checkUnlockConditions(finalData);
 
-        set({ hiraganaData: data });
+        set({ hiraganaUnlocked: data });
 
         if (changed) {
           console.log('New content unlocked!');
@@ -109,33 +111,33 @@ export const useHiraganaStore = create(
       // Reset all progress
       resetProgress: () => {
         const currentState = get();
-        const resetData = currentState.hiraganaData.map((item) => ({
+        const resetData = currentState.currentHiraganaData.map((item) => ({
           ...item,
           points: 0,
           unlocked: item.row === 'a', // Only unlock the first row
         }));
 
-        set({ hiraganaData: resetData });
+        set({ hiraganaUnlocked: resetData });
       },
 
       // Get kana by category
       getKanaByCategory: (category) => {
-        const { hiraganaData } = get();
-        return hiraganaData.filter((item) => item.category === category);
+        const { currentHiraganaData } = get();
+        return currentHiraganaData.filter((item) => item.category === category);
       },
 
       // Get kana by row
       getKanaByRow: (row) => {
-        const { hiraganaData } = get();
-        return hiraganaData.filter((item) => item.row === row);
+        const { currentHiraganaData } = get();
+        return currentHiraganaData.filter((item) => item.row === row);
       },
 
       getUpdatedHiragana: () => {
-        const { hiraganaData } = get();
+        const { hiraganaUnlocked } = get();
         const staticHiragana = getAllHiragana();
 
         const updatekana = new Map(
-          hiraganaData.map((item) => [item.character, item]),
+          hiraganaUnlocked.map((item) => [item.character, item]),
         );
 
         const updatedData = staticHiragana.map((item) => {
@@ -148,7 +150,8 @@ export const useHiraganaStore = create(
 
         const { data, changed } = checkUnlockConditions(updatedData);
 
-        console.log(`this is changed: ${changed}`);
+        set({ currentHiraganaData: data });
+
         return data;
       },
     }),
@@ -159,33 +162,61 @@ export const useHiraganaStore = create(
         console.log('Hiragana store hydrated');
         if (state) {
           // If we have stored data, use it and check unlock conditions
-          if (state.hiraganaData.length > 0) {
-            const { data } = checkUnlockConditions(state.hiraganaData);
-            state.hiraganaData = data;
+          if (state.hiraganaUnlocked.length > 0) {
+            const { data } = checkUnlockConditions(state.hiraganaUnlocked);
+            state.hiraganaUnlocked = data;
           }
           state.isHydrated = true;
         }
       },
+      partialize: (state) => ({
+        hiraganaUnlocked: state.hiraganaUnlocked,
+      }),
     },
   ),
 );
 
-// Selector hooks for better performance
+// Optimized selector hooks for better performance
 export const useHiraganaData = () =>
-  useHiraganaStore((state) => state.hiraganaData);
+  useHiraganaStore((state) => state.hiraganaUnlocked);
+
 export const useIsHydrated = () =>
   useHiraganaStore((state) => state.isHydrated);
+
 export const useHiraganaProgress = () =>
   useHiraganaStore((state) => state.getProgress());
+
+// Combined optimized hooks to reduce re-renders
+export const useHiraganaState = () =>
+  useHiraganaStore(
+    useShallow((state) => ({
+      hiraganaUnlocked: state.hiraganaUnlocked,
+      isHydrated: state.isHydrated,
+    })),
+  );
+
+export const useHiraganaWithProgress = () =>
+  useHiraganaStore(
+    useShallow((state) => ({
+      currentHiraganaData: state.currentHiraganaData,
+      isHydrated: state.isHydrated,
+      progress: state.getProgress,
+      getUpdatedHiragana: state.getUpdatedHiragana,
+    })),
+  );
+
 export const useHiraganaActions = () =>
-  useHiraganaStore((state) => ({
-    setHiraganaData: state.setHiraganaData,
-    initializeHiraganaData: state.initializeHiraganaData,
-    updateKanaItem: state.updateKanaItem,
-    updateKanaByCharacter: state.updateKanaByCharacter,
-    addOrUpdateKana: state.addOrUpdateKana,
-    resetProgress: state.resetProgress,
-  }));
+  useHiraganaStore(
+    useShallow((state) => ({
+      setHiraganaData: state.setHiraganaData,
+      initializeHiraganaData: state.initializeHiraganaData,
+      updateKanaItem: state.updateKanaItem,
+      updateKanaByCharacter: state.updateKanaByCharacter,
+      addOrUpdateKana: state.addOrUpdateKana,
+      resetProgress: state.resetProgress,
+      getUpdatedHiragana: state.getUpdatedHiragana,
+    })),
+  );
 
 export const useGetUpdatedHiragana = () =>
   useHiraganaStore((state) => state.getUpdatedHiragana);

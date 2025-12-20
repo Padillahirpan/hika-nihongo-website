@@ -84,18 +84,16 @@ export default function HiraganaDrilling() {
           <ProgressBar current={progressCurrent} total={progressTotal + 1} />
 
           {/* Question Card */}
-          <ErrorBoundary>
-            <DrillingQuestionCard
-              currentQ={currentQ}
-              showResult={showResult}
-              selectedAnswer={selectedAnswer}
-              progress={progressCurrent}
-              onAnswerSelect={handleAnswerSelect}
-              onCheckAnswer={checkAnswer}
-              onNextQuestion={handleNextQuestion}
-              onPronounceHiragana={pronounceHiragana}
-            />
-          </ErrorBoundary>
+          <DrillingQuestionCard
+            currentQ={currentQ}
+            showResult={showResult}
+            selectedAnswer={selectedAnswer}
+            progress={progressCurrent}
+            onAnswerSelect={handleAnswerSelect}
+            onCheckAnswer={checkAnswer}
+            onNextQuestion={handleNextQuestion}
+            onPronounceHiragana={pronounceHiragana}
+          />
         </div>
       </div>
     </ErrorBoundary>
