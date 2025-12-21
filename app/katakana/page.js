@@ -1,54 +1,70 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import BackButton from "../../components/BackButton";
-import { KanaSection } from "../../components/kana-section";
-import { getLocalHiraganaData } from "../../hooks/user-local-storage";
-import { getAllKatakana} from "../../data/katakana-data";
-import { KATAKANA_DATA_PROGRESS } from "../../hooks/cons-storage";
+import { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import BackButton from '../../components/BackButton';
+import { KanaSection } from '../../components/kana-section';
 import { useLanguage } from '../../contexts/language-context';
+import { useKatakanaWithProgress } from '../../stores/katakana-store';
 
 export default function KatakanaPage() {
   const router = useRouter();
   const { t } = useLanguage();
 
-  const [dataKana, setDataKana] = getLocalHiraganaData(KATAKANA_DATA_PROGRESS, getAllKatakana());  
+  // Optimized Zustand hooks - combined into single call instead of 2
+  const { currentKatakanaData, isHydrated, getUpdatedKatakana } =
+    useKatakanaWithProgress();
 
-  const handleBackToHome = () => {
+  // Get updated katakana data with unlock conditions
+  const updatedKatakanaData = useMemo(() => {
+    if (currentKatakanaData.length === 0) {
+      return getUpdatedKatakana();
+    }
+    return currentKatakanaData;
+  }, []);
+
+  // Iterate through the updated katakana data
+
+  const handleBackToHome = useCallback(() => {
     router.back();
-  };
+  }, [router]);
 
-  const handleDrillingClick = () => {
-    router.push("/katakana-drill");
-  };
+  const handleDrillingClick = useCallback(() => {
+    router.push('/katakana-drill');
+  }, [router]);
 
   return (
     <main className="min-h-screen p-8 bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <BackButton 
-          handleBackToHome={handleBackToHome}
-        />
-        
+        <BackButton handleBackToHome={handleBackToHome} />
+
         <h1 className="text-6xl font-bold mt-8 text-left mb-8 font-jakarta text-gray-800 dark:text-gray-100">
           Katakana
         </h1>
-        <div className="w-full bg-rose-300 dark:bg-rose-400 p-4 rounded-lg mb-4 flex flex-col justify-center" >
+        <div className="w-full bg-rose-300 dark:bg-rose-400 p-4 rounded-lg mb-4 flex flex-col justify-center">
           <p className="text-l font-regular text-white text-left font-jakarta">
-          {t('instructions.flip')}
+            {t('instructions.flip')}
           </p>
           <p className="text-l font-regular text-white text-left font-jakarta">
             {t('instructions.sound')}
           </p>
         </div>
 
-        <KanaSection
-          title="Katakana"
-          data={dataKana}
-        />
+        {isHydrated ? (
+          <KanaSection title="Katakana" data={updatedKatakanaData} />
+        ) : (
+          <div className="flex justify-center items-center py-12">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              <div className="text-gray-500 dark:text-gray-400">
+                Loading kana data...
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-
       </div>
 
       {/* Drilling Button */}

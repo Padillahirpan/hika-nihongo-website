@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/shallow';
 import { generateOptimizedQuestions } from '../util/question-generator';
 import { testType } from '../data/kana-data';
 import { getAllHiragana } from '../data/kana-data';
+import { getAllKatakana } from '../data/katakana-data';
 import { DRILLING } from '../constants';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -14,6 +15,7 @@ export const useDrillingStore = create(
       previousResults: [],
 
       hiraganaData: [],
+      katakanaData: [],
       questions: [],
       currentQuestionIndex: 0,
       score: 0,
@@ -28,14 +30,30 @@ export const useDrillingStore = create(
         set({ hiraganaData: hiragana });
       },
 
+      updateKatakanaData: async (updatedKatakanaData) => {
+        const katakana = updatedKatakanaData || getAllKatakana();
+        set({ katakanaData: katakana });
+      },
+
+      updateKanaData: async (kanaData, testType) => {
+        if (testType === testType.HIRAGANA) {
+          const hiragana = kanaData || getAllHiragana();
+          set({ hiraganaData: hiragana });
+        } else if (testType === testType.KATAKANA) {
+          const katakana = kanaData || getAllKatakana();
+          set({ katakanaData: katakana });
+        }
+      },
+
       // Actions
       setTestType: (type) => {
         set({ currentTestType: type });
       },
 
       generateQuestions: async () => {
-        const { hiraganaData } = get();
-        const updatedKanaData = hiraganaData.filter((item) => item.unlocked);
+        const { hiraganaData, katakanaData, currentTestType } = get();
+        let kanaData = currentTestType === testType.HIRAGANA ? hiraganaData : katakanaData;
+        const updatedKanaData = kanaData.filter((item) => item.unlocked);
         const newQuestions = generateOptimizedQuestions(updatedKanaData);
 
         set({
@@ -242,6 +260,8 @@ export const useDrillingActions = () =>
   useDrillingStore(
     useShallow((state) => ({
       updateHiraganaData: state.updateHiraganaData,
+      updateKatakanaData: state.updateKatakanaData,
+      updateKanaData: state.updateKanaData,
       setTestType: state.setTestType,
       generateQuestions: state.generateQuestions,
       selectAnswer: state.selectAnswer,

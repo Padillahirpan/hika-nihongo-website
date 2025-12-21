@@ -1,14 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '../../components/BackButton';
 import { KanaSection } from '../../components/kana-section';
 import { useLanguage } from '../../contexts/language-context';
-import {
-  useHiraganaWithProgress,
-  useHiraganaActions,
-} from '../../stores/hiragana-store';
+import { useHiraganaWithProgress } from '../../stores/hiragana-store';
 
 export default function HiraganaPage() {
   const router = useRouter();
