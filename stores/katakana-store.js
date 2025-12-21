@@ -3,8 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { useShallow } from 'zustand/shallow';
 import { checkUnlockConditions } from '../util/unlock-logic';
 import { getAllKatakana } from '../data/katakana-data';
-
-const PASS_THRESHOLD = 80;
+import { LEARNING } from '../constants';
 
 export const useKatakanaStore = create(
   persist(
@@ -105,21 +104,27 @@ export const useKatakanaStore = create(
       // Get progress information
       getProgress: () => {
         const { currentKatakanaData } = get();
+        let dataToCheck = currentKatakanaData;
+
+        // If currentHiraganaData is empty, try to get updated data
         if (
           !Array.isArray(currentKatakanaData) ||
           currentKatakanaData.length === 0
         ) {
+          dataToCheck = get().getUpdatedKatakana();
+        }
+
+        if (!Array.isArray(dataToCheck) || dataToCheck.length === 0) {
           return { masteredKana: 0, totalKana: 0 };
         }
 
-        const filtered = currentKatakanaData.filter(
+        const filtered = dataToCheck.filter(
           (item) => item && item.character !== '-',
         );
         const masteredKana = filtered.filter(
-          (item) => Number(item.points) >= PASS_THRESHOLD,
+          (item) => Number(item.points) >= LEARNING.PASS_THRESHOLD,
         ).length;
         const totalKana = filtered.length;
-
         return { masteredKana, totalKana };
       },
 
@@ -193,7 +198,7 @@ export const useKatakanaData = () =>
 export const useKatakanaIsHydrated = () =>
   useKatakanaStore((state) => state.isHydrated);
 export const useKatakanaProgress = () =>
-  useKatakanaStore((state) => state.getProgress());
+  useKatakanaStore(useShallow((state) => state.getProgress));
 
 export const useKatakanaState = () =>
   useKatakanaStore(

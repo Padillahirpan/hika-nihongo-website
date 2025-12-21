@@ -92,12 +92,22 @@ export const useHiraganaStore = create(
 
       // Get progress information
       getProgress: () => {
-        const { hiraganaData } = get();
-        if (!Array.isArray(hiraganaData) || hiraganaData.length === 0) {
+        const { currentHiraganaData } = get();
+        let dataToCheck = currentHiraganaData;
+
+        // If currentHiraganaData is empty, try to get updated data
+        if (
+          !Array.isArray(currentHiraganaData) ||
+          currentHiraganaData.length === 0
+        ) {
+          dataToCheck = get().getUpdatedHiragana();
+        }
+
+        if (!Array.isArray(dataToCheck) || dataToCheck.length === 0) {
           return { masteredKana: 0, totalKana: 0 };
         }
 
-        const filtered = hiraganaData.filter(
+        const filtered = dataToCheck.filter(
           (item) => item && item.character !== '-',
         );
         const masteredKana = filtered.filter(
@@ -184,7 +194,7 @@ export const useIsHydrated = () =>
   useHiraganaStore((state) => state.isHydrated);
 
 export const useHiraganaProgress = () =>
-  useHiraganaStore((state) => state.getProgress());
+  useHiraganaStore(useShallow((state) => state.getProgress));
 
 // Combined optimized hooks to reduce re-renders
 export const useHiraganaState = () =>
