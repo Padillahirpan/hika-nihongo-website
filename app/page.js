@@ -28,10 +28,10 @@ export default function HomePage() {
     //   href: '/kanji',
     //   title: 'Kanji',
     // },
-    {
-      href: '/kana-animated',
-      title: 'Writing',
-    },
+    // {
+    //   href: '/kana-animated',
+    //   title: 'Writing',
+    // },
   ];
 
   return (

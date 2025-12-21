@@ -6,6 +6,8 @@ import BackButton from '../../components/BackButton';
 import { KanaSection } from '../../components/kana-section';
 import { useLanguage } from '../../contexts/language-context';
 import { useKatakanaWithProgress } from '../../stores/katakana-store';
+import { useKanaStrokeData } from '../../stores/kana-stroke-store';
+import KanaStrokeModal from '../../components/KanaStrokeModal';
 
 export default function KatakanaPage() {
   const router = useRouter();
@@ -14,6 +16,8 @@ export default function KatakanaPage() {
   // Optimized Zustand hooks - combined into single call instead of 2
   const { currentKatakanaData, isHydrated, getUpdatedKatakana } =
     useKatakanaWithProgress();
+  const { kanaStroke, showStrokeModal, setShowStrokeModal } =
+    useKanaStrokeData();
 
   // Get updated katakana data with unlock conditions
   const updatedKatakanaData = useMemo(() => {
@@ -46,9 +50,6 @@ export default function KatakanaPage() {
           <p className="text-l font-regular text-white text-left font-jakarta">
             {t('instructions.flip')}
           </p>
-          <p className="text-l font-regular text-white text-left font-jakarta">
-            {t('instructions.sound')}
-          </p>
         </div>
 
         {isHydrated ? (
@@ -65,31 +66,37 @@ export default function KatakanaPage() {
         )}
 
         <div className="w-full h-[20px] mt-16 rounded-lg mb-4 flex items-center justify-center" />
-      </div>
-
-      {/* Drilling Button */}
-      <button
-        onClick={handleDrillingClick}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 max-w-4xl w-11/12 rounded-lg opacity-95 bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 text-white px-6 py-4 shadow-lg transition-all duration-300 hover:scale-105 z-50 flex items-center justify-center space-x-2"
-        aria-label="Start Drilling"
-      >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        {/* Drilling Button */}
+        <button
+          onClick={handleDrillingClick}
+          className="fixed bottom-6 left-1/2 transform -translate-x-1/2 max-w-4xl w-11/12 rounded-lg opacity-95 bg-gradient-to-r from-rose-200 to-rose-400 hover:from-rose-400 hover:to-rose-500 text-white px-6 py-4 shadow-lg transition-all duration-300 hover:scale-105 z-50 flex items-center justify-center space-x-2"
+          aria-label="Start Drilling"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
-        </svg>
-        <span className="sm:text-xl xl:text-2xl font-semibold">
-          Let's start drilling
-        </span>
-      </button>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+          <span className="sm:text-xl xl:text-2xl font-semibold">
+            Let's start drilling
+          </span>
+        </button>
+        {/* Stroke Order Modal */}
+        <KanaStrokeModal
+          isOpen={showStrokeModal}
+          onClose={() => setShowStrokeModal(false)}
+          kana={kanaStroke}
+          script="katakana"
+        />
+      </div>
     </main>
   );
 }

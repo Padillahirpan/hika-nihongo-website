@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useJapaneseSpeech } from '../hooks/useSpeechService';
 import { SPEECH } from '../constants';
+import { useKanaStrokeData } from '../stores/kana-stroke-store';
 
 /**
  * HiraganaCard Component
@@ -22,37 +23,20 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
     voiceName: SPEECH.VOICE_NAME,
   });
 
+  const { setShowStrokeModal } = useKanaStrokeData();
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  const showStrokes = (e) => {
+    e.stopPropagation();
+    setShowStrokeModal(true, kana);
+  };
+
   // Function to handle card flip
   const handleCardFlip = () => {
     setIsFlipped(!isFlipped);
-  };
-
-  // Function to pronounce the hiragana using new SpeechService
-  const pronounceHiragana = (e) => {
-    e.stopPropagation();
-    if (!canSpeak) {
-      console.warn('Speech synthesis is not supported in this browser');
-      return;
-    }
-
-    // Create kana object for speech service
-    const kanaObj = { character: kana, romaji };
-
-    speakKana(kanaObj, {
-      onError: (error) => {
-        console.error('Speech service error:', error);
-      },
-      onStart: () => {
-        console.log('Pronouncing:', kana);
-      },
-      onEnd: () => {
-        console.log('Pronunciation completed for:', kana);
-      },
-    });
   };
 
   // Determine background color based on mastery level
@@ -87,7 +71,7 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
     return (
       <div className="flex w-full h-[80px] md:w-full md:h-[190px] lg:w-full cursor-pointer">
         <div className="flex w-full h-full flex-col items-center justify-center rounded-lg shadow-md bg-gray-200 dark:bg-gray-700">
-          <span className="text-xs sm:text-6xl font-bold text-gray-400 dark:text-gray-500 font-noto-jp">
+          <span className="text-2xl sm:text-6xl font-bold text-gray-400 dark:text-gray-500 font-noto-jp">
             {kana}
           </span>
         </div>
@@ -109,61 +93,42 @@ const HiraganaCard = ({ kana, romaji, masteryLevel = 0, unlocked = false }) => {
       >
         {/* Front of card (Hiragana) */}
         <div
-          className={`flex w-full h-full flex flex-col items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden]`}
+          className={`w-full h-full flex flex-col items-center justify-center rounded-lg shadow-xl ${getBackgroundColor()} [backface-visibility:hidden]`}
         >
           <span
-            className={`text-xs sm:text-6xl font-bold ${getTextColor()} font-noto-jp`}
+            className={`text-2xl sm:text-6xl font-bold ${getTextColor()} font-noto-jp`}
           >
             {kana}
           </span>
-
-          <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4">
-            <button
-              onClick={pronounceHiragana}
-              disabled={!canSpeak || isSpeaking}
-              className={`p-1 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-300 ${
-                !canSpeak
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : isSpeaking
-                    ? 'bg-red-400 text-white hover:bg-red-500'
-                    : 'bg-sky-400 text-white hover:bg-sky-500'
-              }`}
-              aria-label={isSpeaking ? 'Speaking...' : 'Pronounce'}
-              title={canSpeak ? 'Click to pronounce' : 'Speech not supported'}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`lg:h-6 lg:w-6 md:h-4 md:w-4 h-4 w-4 ${
-                  isSpeaking ? 'animate-pulse' : ''
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isSpeaking ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
         </div>
 
         {/* Back of card (Romaji) */}
         <div
-          className={`absolute w-full h-full flex items-center justify-center rounded-lg shadow-md ${getBackgroundColor()} [backface-visibility:hidden] [transform:rotateY(180deg)]`}
+          className={`absolute w-full h-full flex items-center justify-center rounded-lg shadow-xl ${getBackgroundColor()} [backface-visibility:hidden] [transform:rotateY(180deg)]`}
         >
+          <div className="absolute bottom-2 right-2 lg:bottom-4 lg:right-4 flex gap-1">
+            <button
+              onClick={showStrokes}
+              className="p-1 rounded-full bg-purple-400 text-white hover:bg-purple-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-300"
+              aria-label="Show stroke order"
+              title="Show stroke order"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="lg:h-6 lg:w-6 md:h-4 md:w-4 h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
+              </svg>
+            </button>
+          </div>
           <span
             className={`text-lg sm:text-4xl font-bold ${getTextColor()} font-noto-jp`}
           >

@@ -1,4 +1,3 @@
-import { useEffect, useState, useMemo } from 'react';
 import { useHiraganaProgress } from '../stores/hiragana-store';
 import { useKatakanaProgress } from '../stores/katakana-store';
 
@@ -7,31 +6,17 @@ import { useKatakanaProgress } from '../stores/katakana-store';
  * This replaces the legacy localStorage hooks with Zustand store hooks
  */
 export const useKanaProgress = () => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   try {
     const hiraganaProgress = useHiraganaProgress();
     const katakanaProgress = useKatakanaProgress();
 
-    const result = useMemo(() => {
-      // Default values for SSR and before mount
-      if (!isMounted) {
-        return {
-          hiragana: { masteredKana: 0, totalKana: 0 },
-          katakana: { masteredKana: 0, totalKana: 0 },
-        };
-      }
+    console.log(`this is data hiragana: ${JSON.stringify(hiraganaProgress)}`);
+    console.log(`this is data katakana: ${JSON.stringify(katakanaProgress)}`);
 
-      const hiragana = hiraganaProgress() || { masteredKana: 0, totalKana: 0 };
-      const katakana = katakanaProgress() || { masteredKana: 0, totalKana: 0 };
-      return { hiragana, katakana };
-    }, [isMounted]);
-
-    return result;
+    return {
+      hiragana: hiraganaProgress || { masteredKana: 0, totalKana: 0 },
+      katakana: katakanaProgress || { masteredKana: 0, totalKana: 0 },
+    };
   } catch (error) {
     console.error('Error in useKanaProgress:', error);
     // Fallback to default values to prevent infinite loops
