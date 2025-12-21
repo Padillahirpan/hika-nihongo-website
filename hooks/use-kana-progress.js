@@ -10,12 +10,9 @@ export const useKanaProgress = () => {
     const hiraganaProgress = useHiraganaProgress();
     const katakanaProgress = useKatakanaProgress();
 
-    console.log(`this is data hiragana: ${JSON.stringify(hiraganaProgress)}`);
-    console.log(`this is data katakana: ${JSON.stringify(katakanaProgress)}`);
-
     return {
-      hiragana: hiraganaProgress || { masteredKana: 0, totalKana: 0 },
-      katakana: katakanaProgress || { masteredKana: 0, totalKana: 0 },
+      hiragana: hiraganaProgress() || { masteredKana: 0, totalKana: 0 },
+      katakana: katakanaProgress() || { masteredKana: 0, totalKana: 0 },
     };
   } catch (error) {
     console.error('Error in useKanaProgress:', error);

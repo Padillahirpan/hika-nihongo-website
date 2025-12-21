@@ -128,18 +128,6 @@ export const useKatakanaStore = create(
         return { masteredKana, totalKana };
       },
 
-      // Reset all progress
-      resetProgress: () => {
-        const currentState = get();
-        const resetData = currentState.currentKatakanaData.map((item) => ({
-          ...item,
-          points: 0,
-          unlocked: item.row === 'a', // Only unlock the first row
-        }));
-
-        set({ currentKatakanaData: resetData });
-      },
-
       // Get kana by category
       getKanaByCategory: (category) => {
         const { currentKatakanaData } = get();
@@ -174,6 +162,10 @@ export const useKatakanaStore = create(
 
         set({ currentKatakanaData: updatedData });
         return updatedData;
+      },
+      // Reset all progress
+      resetProgress: () => {
+        set({ katakanaUnlocked: [] });
       },
     }),
     {
@@ -239,3 +231,6 @@ export const useUpdateKanaByCharacter = () =>
 
 export const useAddOrUpdateKana = () =>
   useKatakanaStore((state) => state.addOrUpdateKana);
+
+export const useResetKatakanaData = () =>
+  useKatakanaStore((state) => state.resetProgress);

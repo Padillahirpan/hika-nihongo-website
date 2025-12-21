@@ -95,6 +95,10 @@ export const useHiraganaStore = create(
         const { currentHiraganaData } = get();
         let dataToCheck = currentHiraganaData;
 
+        console.log(
+          `this is GET_PROGRESS: ${JSON.stringify(dataToCheck.length)}`,
+        );
+
         // If currentHiraganaData is empty, try to get updated data
         if (
           !Array.isArray(currentHiraganaData) ||
@@ -120,14 +124,7 @@ export const useHiraganaStore = create(
 
       // Reset all progress
       resetProgress: () => {
-        const currentState = get();
-        const resetData = currentState.currentHiraganaData.map((item) => ({
-          ...item,
-          points: 0,
-          unlocked: item.row === 'a', // Only unlock the first row
-        }));
-
-        set({ hiraganaUnlocked: resetData });
+        set({ hiraganaUnlocked: [] });
       },
 
       // Get kana by category
@@ -236,3 +233,6 @@ export const useUpdateKanaByCharacter = () =>
 
 export const useAddOrUpdateKana = () =>
   useHiraganaStore((state) => state.addOrUpdateKana);
+
+export const useResetHiraganaData = () =>
+  useHiraganaStore((state) => state.resetProgress);

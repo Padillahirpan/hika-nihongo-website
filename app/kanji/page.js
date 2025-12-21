@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import BackButton from "../../components/BackButton";
-import KanaStrokePlayer from "../../components/KanaStrokePlayer";
-import { getAllKanji } from "../../data/kanji-data";
-import { useLanguage } from "../../contexts/language-context";
-import { useSpeechSynthesis } from "../../util/use-speech-synthesis";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import BackButton from '../../components/BackButton';
+import KanaStrokePlayer from '../../components/KanaStrokePlayer';
+import { getAllKanji } from '../../data/kanji-data';
+import { useLanguage } from '../../contexts/language-context';
+import { useSpeechSynthesis } from '../../util/use-speech-synthesis';
 
 const buildGlyphFromKanji = (kanjiItem) => {
   if (!kanjiItem?.kanji) {
@@ -32,7 +32,7 @@ const buildGlyphFromKanji = (kanjiItem) => {
     id: `kanji-${codePoint.toString(16)}`,
     kana: primaryChar,
     romaji: kanjiItem.romaji,
-    script: "kanji",
+    script: 'kanji',
     codepoint: codePoint.toString(16).toUpperCase(),
   };
 };
@@ -71,16 +71,22 @@ const KanjiCard = ({ item, onPronounce, onShowDetail }) => (
         </button>
       </div>
       {item.character && (
-        <p className="mt-3 text-sm text-gray-500 dark:text-gray-300 font-noto-jp">{item.character}</p>
+        <p className="mt-3 text-sm text-gray-500 dark:text-gray-300 font-noto-jp">
+          {item.character}
+        </p>
       )}
       {item.romaji && (
-        <p className="mt-1 text-xs uppercase tracking-wide text-rose-500 dark:text-rose-300">{item.romaji}</p>
+        <p className="mt-1 text-xs uppercase tracking-wide text-rose-500 dark:text-rose-300">
+          {item.romaji}
+        </p>
       )}
     </div>
     <div className="mt-4">
       <p className="text-sm text-gray-600 dark:text-gray-300">
-        <span className="font-semibold text-gray-700 dark:text-gray-100">Meaning (ID): </span>
-        {item.indonesia || "-"}
+        <span className="font-semibold text-gray-700 dark:text-gray-100">
+          Meaning (ID):{' '}
+        </span>
+        {item.indonesia || '-'}
       </p>
     </div>
     <button
@@ -109,35 +115,66 @@ const KanjiDetailModal = ({ kanjiItem, onClose }) => {
           className="absolute right-4 top-4 rounded-full bg-gray-200 p-2 text-gray-600 transition hover:bg-gray-300 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           aria-label="Close"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="flex justify-center">
-            <KanaStrokePlayer glyph={glyph} strokeColor="#fb7185" strokeWidth={10} />
+            <KanaStrokePlayer
+              glyph={glyph}
+              strokeColor="#fb7185"
+              strokeWidth={6}
+            />
           </div>
           <div className="flex flex-col justify-center space-y-4">
             <div>
-              <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">Kanji</p>
-              <h2 className="text-5xl font-bold text-gray-900 dark:text-gray-100 font-noto-jp">{kanjiItem.kanji}</h2>
+              <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">
+                Kanji
+              </p>
+              <h2 className="text-5xl font-bold text-gray-900 dark:text-gray-100 font-noto-jp">
+                {kanjiItem.kanji}
+              </h2>
             </div>
             {kanjiItem.character && (
               <div>
-                <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">Kana</p>
-                <p className="text-2xl text-gray-700 dark:text-gray-200 font-noto-jp">{kanjiItem.character}</p>
+                <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">
+                  Kana
+                </p>
+                <p className="text-2xl text-gray-700 dark:text-gray-200 font-noto-jp">
+                  {kanjiItem.character}
+                </p>
               </div>
             )}
             {kanjiItem.romaji && (
               <div>
-                <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">Romaji</p>
-                <p className="text-xl text-gray-700 dark:text-gray-200">{kanjiItem.romaji}</p>
+                <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">
+                  Romaji
+                </p>
+                <p className="text-xl text-gray-700 dark:text-gray-200">
+                  {kanjiItem.romaji}
+                </p>
               </div>
             )}
             <div>
-              <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">Meaning (ID)</p>
-              <p className="text-base text-gray-700 dark:text-gray-200">{kanjiItem.indonesia || "-"}</p>
+              <p className="text-sm uppercase tracking-wide text-rose-400 dark:text-rose-300">
+                Meaning (ID)
+              </p>
+              <p className="text-base text-gray-700 dark:text-gray-200">
+                {kanjiItem.indonesia || '-'}
+              </p>
             </div>
           </div>
         </div>
@@ -147,7 +184,7 @@ const KanjiDetailModal = ({ kanjiItem, onClose }) => {
 };
 
 const KanjiGrid = ({ kanjiList }) => {
-  const { supported, speak } = useSpeechSynthesis("ja-JP");
+  const { supported, speak } = useSpeechSynthesis('ja-JP');
   const [selectedKanji, setSelectedKanji] = useState(null);
 
   if (!Array.isArray(kanjiList) || kanjiList.length === 0) {
@@ -157,18 +194,18 @@ const KanjiGrid = ({ kanjiList }) => {
   const handlePronounce = (event, item) => {
     event.stopPropagation();
     if (!supported) {
-      console.error("Web Speech API is not supported in this browser");
+      console.error('Web Speech API is not supported in this browser');
       return;
     }
     speak(item.kanji, {
-      lang: "ja-JP",
+      lang: 'ja-JP',
       rate: 0.6,
       pitch: 1,
       volume: 5,
-      voiceName: "Google 日本語",
-      onStart: () => console.log("Pronouncing:", item.kanji),
-      onEnd: () => console.log("Done"),
-      onError: (error) => console.error("TTS error:", error.error),
+      voiceName: 'Google 日本語',
+      onStart: () => console.log('Pronouncing:', item.kanji),
+      onEnd: () => console.log('Done'),
+      onError: (error) => console.error('TTS error:', error.error),
     });
   };
 
@@ -193,7 +230,12 @@ const KanjiGrid = ({ kanjiList }) => {
         ))}
       </div>
       {/* <ButtonDrilling /> */}
-      {selectedKanji && <KanjiDetailModal kanjiItem={selectedKanji} onClose={handleCloseDetail} />}
+      {selectedKanji && (
+        <KanjiDetailModal
+          kanjiItem={selectedKanji}
+          onClose={handleCloseDetail}
+        />
+      )}
     </>
   );
 };
@@ -202,7 +244,7 @@ const ButtonDrilling = () => {
   const router = useRouter();
 
   const handleDrillingClick = () => {
-    router.push("/kanji-drill");
+    router.push('/kanji-drill');
   };
 
   return (
@@ -236,8 +278,8 @@ export default function KanjiPage() {
 
   const kanjiList = getAllKanji();
   const descriptions = {
-    en: "Browse the full list of starter kanji with their readings and meanings.",
-    id: "Jelajahi daftar lengkap kanji dasar beserta cara baca dan artinya.",
+    en: 'Browse the full list of starter kanji with their readings and meanings.',
+    id: 'Jelajahi daftar lengkap kanji dasar beserta cara baca dan artinya.',
   };
   const description = descriptions[language] || descriptions.en;
 

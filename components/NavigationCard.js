@@ -3,8 +3,6 @@ import ProgressBar from './ProgressBar';
 
 const NavigationCard = ({ href, title, progress }) => {
   const hasProgress = progress && progress.total > 0;
-
-  console.log(`ini data progress: ${progress} dan hasProgress: ${hasProgress}`);
   return (
     <Link
       href={href}

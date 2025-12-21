@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useState, useEffect, useMemo } from 'react';
 import BubbleGradient from '../components/BubbleGradient';
 import NavigationCard from '../components/NavigationCard';
 import WelcomeText from '../components/WelcomeText';
@@ -9,30 +10,40 @@ import { useKanaProgress } from '../hooks/use-kana-progress';
 
 export default function HomePage() {
   const { hiragana, katakana } = useKanaProgress();
+  const [isClient, setIsClient] = useState(false);
 
-  const { masteredKana: hiraganaKana, totalKana: hiraganaTotal } = hiragana;
-  const { masteredKana: katakanaKana, totalKana: katakanaTotal } = katakana;
+  // Fix hydration mismatch by ensuring client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  const navigationSections = [
-    {
-      href: '/hiragana',
-      title: 'Hiragana',
-      progress: { current: hiraganaKana, total: hiraganaTotal },
-    },
-    {
-      href: '/katakana',
-      title: 'Katakana',
-      progress: { current: katakanaKana, total: katakanaTotal },
-    },
-    // {
-    //   href: '/kanji',
-    //   title: 'Kanji',
-    // },
-    // {
-    //   href: '/kana-animated',
-    //   title: 'Writing',
-    // },
-  ];
+  const navigationItems = useMemo(() => {
+    // Only show progress data after client-side hydration
+    const progressData = isClient
+      ? { current: hiragana.masteredKana, total: hiragana.totalKana }
+      : { current: 0, total: 0 };
+
+    const katakanaProgress = isClient
+      ? { current: katakana.masteredKana, total: katakana.totalKana }
+      : { current: 0, total: 0 };
+
+    return [
+      {
+        href: '/hiragana',
+        title: 'Hiragana',
+        progress: progressData,
+      },
+      {
+        href: '/katakana',
+        title: 'Katakana',
+        progress: katakanaProgress,
+      },
+      {
+        href: '/kanji',
+        title: 'Kanji',
+      },
+    ];
+  }, [hiragana, katakana, isClient]);
 
   return (
     <div className="min-h-screen bg-grey-50 dark:bg-gray-900">
@@ -59,17 +70,14 @@ export default function HomePage() {
 
       <div className="fixed left-0 right-0 bottom-8 flex items-center justify-center gap-4 px-4 sm:bottom-4 xl:bottom-32 z-50">
         <div className="flex w-11/12 max-w-4xl flex-col items-center gap-4">
-          {navigationSections.map(({ href, title, progress }) => {
-            console.log(`ini data progress: ${JSON.stringify(progress)}`);
-            return (
-              <NavigationCard
-                key={href}
-                href={href}
-                title={title}
-                progress={progress}
-              />
-            );
-          })}
+          {navigationItems.map(({ href, title, progress }) => (
+            <NavigationCard
+              key={href}
+              href={href}
+              title={title}
+              progress={progress}
+            />
+          ))}
         </div>
       </div>
     </div>
