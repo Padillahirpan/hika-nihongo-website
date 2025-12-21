@@ -1,12 +1,22 @@
-const ProgressBar = ({ current, total, baseColor, progressColor, size = 1 }) => {
-  const progress = (current / total) * 100;
-  const baseColorClass = baseColor || "bg-rose-100 dark:bg-rose-900";
-  const progressColorClass = progressColor || "bg-gradient-to-r from-rose-400 to-rose-500 dark:from-rose-500 dark:to-rose-400";
-  const sizeClass = size === 1 ? "h-5 lg:h-8" : "h-3 lg:h-4";
+'use client';
+
+const ProgressBar = ({
+  current,
+  total,
+  baseColor,
+  progressColor,
+  size = 1,
+}) => {
+  const progress = total > 0 ? (current / total) * 100 : 0;
+  const baseColorClass = baseColor || 'bg-rose-100 dark:bg-rose-900';
+  const progressColorClass =
+    progressColor ||
+    'bg-gradient-to-r from-rose-400 to-rose-500 dark:from-rose-500 dark:to-rose-400';
+  const sizeClass = size === 1 ? 'h-5 lg:h-8' : 'h-3 lg:h-4';
 
   return (
     <div className={`w-full ${baseColorClass} rounded-full ${sizeClass} `}>
-      <div 
+      <div
         className={`${progressColorClass} ${sizeClass} rounded-full transition-all duration-300 ease-in-out`}
         style={{ width: `${progress}%` }}
       />

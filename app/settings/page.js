@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import BackButton from "../../components/BackButton";
+import { useRouter } from 'next/navigation';
+import BackButton from '../../components/BackButton';
 import { useTheme } from '../../contexts/theme-context';
 import { useLanguage } from '../../contexts/language-context';
 import Modal from '../../components/Modal';
 import { useState } from 'react';
+import { useSetting } from '../../hooks/use-setting';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -13,10 +14,10 @@ export default function SettingsPage() {
 
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage, t } = useLanguage();
+  const { resetHiraganaData, resetKatakanaData, resetAllData } = useSetting();
 
   const resetData = () => {
-    localStorage.removeItem('hiraganaDataProgress');
-    localStorage.removeItem('katakanaDataProgress');
+    resetAllData();
     router.refresh();
   };
 
@@ -27,11 +28,8 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-japan-white-off dark:bg-gray-900 transition-colors">
       <div className="max-w-4xl mx-auto p-8">
-        
         {/* Back Button */}
-        <BackButton 
-          handleBackToHome={handleBackToHome}
-        />
+        <BackButton handleBackToHome={handleBackToHome} />
 
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8 mt-8">
           {t('settings.title')}
