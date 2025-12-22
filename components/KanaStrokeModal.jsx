@@ -5,6 +5,7 @@ import { KANA_GLYPHS } from '../data/kana-strokes';
 import KanaStrokePlayer from './KanaStrokePlayer';
 import { useJapaneseSpeech } from '../hooks/useSpeechService';
 import { SPEECH } from '../constants';
+import { logger } from '../util/logger';
 
 const KanaStrokeModal = ({ isOpen, onClose, kana, script = 'hiragana' }) => {
   const [glyph, setGlyph] = useState(null);
@@ -61,7 +62,7 @@ const KanaStrokeModal = ({ isOpen, onClose, kana, script = 'hiragana' }) => {
     }
 
     // Create kana object for speech service
-    console.log(`this is kana: ${JSON.stringify(glyph)}`);
+    logger.info(`this is kana: ${JSON.stringify(glyph)}`);
     const kanaObj = { character: glyph.kana, romaji: glyph.romaji };
 
     speakKana(kanaObj, {
