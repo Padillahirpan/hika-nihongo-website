@@ -36,6 +36,7 @@ export default function HiraganaDrilling() {
     handleRestartDrilling,
     pronounceHiragana,
     handleRetry,
+    loadPreviousResultsAction,
   } = useDrillingLogic();
 
   // Show loading states
@@ -64,7 +65,7 @@ export default function HiraganaDrilling() {
     return (
       <DrillingFinished
         score={score}
-        previousResults={previousResults}
+        previousResults={loadPreviousResultsAction()}
         onRestartDrilling={handleRestartDrilling}
         onBackToHome={handleBackToHome}
         t={t}

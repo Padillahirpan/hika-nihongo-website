@@ -95,10 +95,6 @@ export const useHiraganaStore = create(
         const { currentHiraganaData } = get();
         let dataToCheck = currentHiraganaData;
 
-        console.log(
-          `this is GET_PROGRESS: ${JSON.stringify(dataToCheck.length)}`,
-        );
-
         // If currentHiraganaData is empty, try to get updated data
         if (
           !Array.isArray(currentHiraganaData) ||

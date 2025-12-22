@@ -36,6 +36,7 @@ export default function KatakanaDrilling() {
     handleRestartDrilling,
     pronounceKatakana,
     handleRetry,
+    loadPreviousResultsAction,
   } = useKatakanaDrillingLogic();
 
   // Show loading states
@@ -64,7 +65,7 @@ export default function KatakanaDrilling() {
     return (
       <DrillingFinished
         score={score}
-        previousResults={previousResults}
+        previousResults={loadPreviousResultsAction()}
         onRestartDrilling={handleRestartDrilling}
         onBackToHome={handleBackToHome}
         t={t}

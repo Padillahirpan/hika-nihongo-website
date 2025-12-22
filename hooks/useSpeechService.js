@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { getSpeechService, resetSpeechService } from '../services/SpeechService';
+import { getSpeechService } from '../services/SpeechService';
+import { logger } from '../util/logger';
 
 /**
  * React hook for SpeechService
@@ -216,23 +217,26 @@ export function useJapaneseSpeech(kanaSettings = {}) {
     error,
     voices,
     selectedVoice,
-    setVoice
+    setVoice,
   } = useSpeechService(japaneseSettings);
 
   // Speak kana character
-  const speakKana = useCallback((kana, options = {}) => {
-    return speak(kana, {
-      ...options,
-      onStart: () => {
-        console.log('Pronouncing kana:', kana.character || kana);
-        if (options.onStart) options.onStart();
-      },
-      onEnd: () => {
-        console.log('Pronunciation completed for:', kana.character || kana);
-        if (options.onEnd) options.onEnd();
-      },
-    });
-  }, [speak]);
+  const speakKana = useCallback(
+    (kana, options = {}) => {
+      return speak(kana, {
+        ...options,
+        onStart: () => {
+          logger.info('Pronouncing kana:', kana.character || kana);
+          if (options.onStart) options.onStart();
+        },
+        onEnd: () => {
+          logger.info('Pronunciation completed for:', kana.character || kana);
+          if (options.onEnd) options.onEnd();
+        },
+      });
+    },
+    [speak],
+  );
 
   return {
     canSpeak: isSupported,

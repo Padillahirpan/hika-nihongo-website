@@ -57,7 +57,9 @@ export const useKanaProgress = (key) => {
     if (!Array.isArray(parsed)) return;
 
     const filtered = parsed.filter((item) => item && item.character !== '-');
-    const masteredKana = filtered.filter((item) => Number(item.points) >= PASS_THRESHOLD).length;
+    const masteredKana = filtered.filter(
+      (item) => Number(item.points) >= PASS_THRESHOLD,
+    ).length;
     const totalKana = filtered.length;
 
     setProgress({ masteredKana, totalKana });
@@ -75,7 +77,6 @@ export const getCurrentKanaProgress = useKanaProgress;
  * Starts with `initialValue` to avoid hydration mismatches.
  */
 export const useLocalHiraganaData = (key, initialValue) => {
-  console.log(`ini adalah useLocalHiraganaData`)
   const [value, setValue] = useState(initialValue);
   const [hydrated, setHydrated] = useState(false);
 
@@ -89,16 +90,11 @@ export const useLocalHiraganaData = (key, initialValue) => {
       if (changed) {
         writeJSON(key, data);
         setValue(data);
-
-      console.log(`this is parse not null CHANGED`)
-
       } else {
-      console.log(`this is parse not null NOT CHANGED`)
-
         setValue(parsed);
       }
     } else {
-      console.log(`this is parse null`)
+      console.log(`this is parse null`);
 
       writeJSON(key, initialValue);
       setValue(initialValue);

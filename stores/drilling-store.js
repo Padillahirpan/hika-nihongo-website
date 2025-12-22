@@ -52,7 +52,8 @@ export const useDrillingStore = create(
 
       generateQuestions: async () => {
         const { hiraganaData, katakanaData, currentTestType } = get();
-        let kanaData = currentTestType === testType.HIRAGANA ? hiraganaData : katakanaData;
+        let kanaData =
+          currentTestType === testType.HIRAGANA ? hiraganaData : katakanaData;
         const updatedKanaData = kanaData.filter((item) => item.unlocked);
         const newQuestions = generateOptimizedQuestions(updatedKanaData);
 

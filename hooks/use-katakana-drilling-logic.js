@@ -263,5 +263,6 @@ export function useKatakanaDrillingLogic() {
     handleRestartDrilling,
     pronounceKatakana,
     handleRetry,
+    loadPreviousResultsAction,
   };
 }

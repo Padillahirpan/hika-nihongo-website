@@ -4,6 +4,7 @@ import { useJapaneseSpeech } from './useSpeechService';
 import { useHiraganaStore } from '../stores/hiragana-store';
 import { useDrillingState, useDrillingActions } from '../stores/drilling-store';
 import { LEARNING, SPEECH } from '../constants';
+import { testType } from '../data/kana-data';
 import { LoadingStates } from '../components/LoadingState';
 
 export function useDrillingLogic() {
@@ -51,6 +52,7 @@ export function useDrillingLogic() {
     loadPreviousResults: loadPreviousResultsAction,
     getCurrentQuestion: getCurrentQuestionAction,
     resetDrilling: resetDrillingAction,
+    setTestType,
   } = useDrillingActions();
 
   // Speech synthesis functionality using new SpeechService
@@ -130,7 +132,7 @@ export function useDrillingLogic() {
   };
 
   // Load previous results
-  const loadPreviousResults = () => {
+  const loadCurrentPrevResults = () => {
     loadPreviousResultsAction();
   };
 
@@ -141,13 +143,16 @@ export function useDrillingLogic() {
         setLoadingState(LoadingStates.LOADING);
         setLoadingMessage('Loading kana data...');
 
+        // Set the test type to hiragana first
+        setTestType(testType.HIRAGANA);
+
         await updateHiraganaData(currentHiraganaData);
 
         setLoadingMessage('Generating questions...');
         await generateQuestions();
 
         setLoadingMessage('Loading previous results...');
-        loadPreviousResults();
+        loadCurrentPrevResults();
 
         setLoadingState(LoadingStates.SUCCESS);
       } catch (error) {
@@ -215,7 +220,7 @@ export function useDrillingLogic() {
       try {
         setLoadingMessage('Retrying initialization...');
         await generateQuestions();
-        loadPreviousResults();
+        loadCurrentPrevResults();
         setLoadingState(LoadingStates.SUCCESS);
       } catch (retryError) {
         console.error('Retry failed:', retryError);
@@ -258,5 +263,6 @@ export function useDrillingLogic() {
     handleRestartDrilling,
     pronounceHiragana,
     handleRetry,
+    loadPreviousResultsAction,
   };
 }
